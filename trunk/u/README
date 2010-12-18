@@ -1,0 +1,9 @@
+DESCRIPTION
+  The package is used to setup Hudson & DejaGNU.
+
+FILES
+  setup.sh
+    Runs Hudson and sets SSH connection to SSH_SERVER:SSH_PORT
+  configure_packages.sh
+    Installs required packages for CentOS / RedHat
+

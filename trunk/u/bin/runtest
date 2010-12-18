@@ -1,0 +1,15 @@
+#!/bin/sh
+
+DDIR=`dirname "$0"`/..
+. "$DDIR"/util.sh
+
+function test_dist() {
+  cd "$DDIR"/dist/dejagnu
+  mkdir -p dejagnu
+  make check
+}
+
+git_dist git://git.sv.gnu.org/dejagnu.git
+
+exec_tool "$@"
+
