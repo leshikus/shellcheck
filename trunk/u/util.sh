@@ -8,13 +8,8 @@ uname -a
 #
 # Generic Functions
 #
-function error() {
-  echo "$1"
-  exit 1
-}
-
-function get_timestamp() {
-  date '+%d%H%M%S'
+function get_script_dir() {
+  readlink -f `dirname "$0"`
 }
 
 function set_tmp_file_name() {
@@ -158,21 +153,13 @@ function git_dist() {
 }
 
 function update_dist() {
-  DIST="$1"
-  DIST_NAME=`echo $DIST | sed  -e 's/^.*://; s/^.*\///g'`
+  local DIST="$SSH_ID:$1"
+  local DIST_NAME=`basename "$1"`
 
   rsync -lptDzve "$SVN_SSH" "$DIST" "$DDIR"/timestamp |
     fgrep "$DIST_NAME" || return 0
 
   rsync -rLptDzve "$SVN_SSH" "$DIST" "$DDIR"/dist
-}
-
-function add_path() {
-  fgrep -x "$1" "$DDIR/tmp/path.txt" || echo "$1" >>"$DDIR/tmp/path.txt"
-  (
-    perl -p -e 's/\n/:/' "$DDIR/tmp/path.txt" | sed -e 's/^/PATH="/'
-    echo $PATH'"; export PATH'
-  ) >"$DDIR/tmp/set_path.sh"
 }
 
 #
