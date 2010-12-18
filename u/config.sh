@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Detect errors
+set -evx
+
 # Environment functions
 function error() {
   echo "$1"

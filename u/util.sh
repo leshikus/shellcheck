@@ -175,3 +175,41 @@ function exec_tool() {
   exec "$LOC" "$@"
 }
 
+function set_tool_path() {
+  TOOL="$1"
+  local bin=`dirname "$TOOL"`
+  local name=`basename "$TOOL"`
+  test -x "$TOOL" || {
+    ssh -p $SSH_PORT $SSH_ID "test -x '$TOOL'" ||
+        error "The tool '$TOOL' cannot be found"
+    local basedir=`basename "$bin"`
+    if test "$basedir" = bin
+    then
+      bin=`dirname "$bin"`
+      basedir=`basename "$bin"`/"$basedir"
+    fi
+    
+    update_dist "$bin"
+    bin="$DDIR/dist/$basedir"
+  }
+  PATH="$bin:$PATH"
+  export PATH
+
+  TOOL="$bin/$name"
+}
+
+function set_cc() {
+  set_tool_path "$1"
+
+  TARGET_CC="$TOOL"
+  TARGET_AS=`echo "$TOOL" | sed -e 's/g\?cc$/as/'`
+  TARGET_LD=`echo "$TOOL" | sed -e 's/g\?cc$/ld/'`
+  export TARGET_CC TARGET_AS TARGET_LD
+}
+
+function set_simulator() {
+  set_tool_path "$1"
+  SIMULATOR="$TOOL"
+  export SIMULATOR
+}
+
