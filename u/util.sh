@@ -175,6 +175,9 @@ function exec_tool() {
   exec "$LOC" "$@"
 }
 
+#
+# Setting environment
+#
 function set_tool_path() {
   TOOL="$1"
   local bin=`dirname "$TOOL"`
@@ -212,4 +215,70 @@ function set_simulator() {
   SIMULATOR="$TOOL"
   export SIMULATOR
 }
+
+#
+# Running tests
+#
+function add_script_env() {
+  local var="$1"
+
+  case "$2" in
+    *$var*) echo "$var=\${\$$var:-`eval \$$var`}"
+  esac
+}
+
+function create_launch_scripts() {
+  local test_dir="$1"
+  local test_ext="$2"
+  shift 2
+
+  mkdir -p "$RESULT_DIR"
+  cat <<EOF
+function pass() {
+  echo "\$1" >>'$RESULT_DIR'/successful.list
+}
+
+function fail() {
+  echo "\$1" >>'$RESULT_DIR'/failure.list
+}
+
+EOF
+  
+  find "$test_dir" -name "*$test_ext" "$@" | while read t
+  do
+    local test=`basename "$t" $test_ext` 
+    local dir=`dirname "$t"`
+    local launcher="$dir/$test.sh"
+    local script=`get_script_source $test`
+
+    cat <<EOF >"$launcher"
+#!/bin/sh
+
+set -evx
+`
+add_script_env TARGET_CC '$script'
+add_script_env TARGET_AS '$script'
+add_script_env TARGET_LD '$script'
+add_script_env SIMULATOR '$script'`
+
+cd '$dir'
+$script
+EOF
+    echo "sh '$launcher' && pass '$t' || fail '$t'"
+  done
+}
+
+function evaluate_log() (
+  cd "$RESULT_DIR"
+
+  get_exclude_list >expected_fail.list
+  touch successful.list failure.list
+  cat failure.list expected_fail.list expected_fail.list | sort | uniq -c |
+    awk '{ if ($1 == 1) print $2 }' >unexpected_fail.list
+
+  echo "Tests completed:"
+  wc -l successful.list failure.list
+  wc -l expected_fail.list unexpected_fail.list
+  test -s unexpected_fail.list
+)
 
