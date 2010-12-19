@@ -202,16 +202,16 @@ function set_tool_path() {
 }
 
 function set_cc() {
-  set_tool_path "$1"
+  set_tool_path ${TARGET_CC:-$1}
 
   TARGET_CC="$TOOL"
-  TARGET_AS=`echo "$TOOL" | sed -e 's/g\?cc$/as/'`
-  TARGET_LD=`echo "$TOOL" | sed -e 's/g\?cc$/ld/'`
+  TARGET_AS=${TARGET_AS:-`echo "$TOOL" | sed -e 's/g\?cc$/as/'`}
+  TARGET_LD=${TARGET_LD:-`echo "$TOOL" | sed -e 's/g\?cc$/ld/'`}
   export TARGET_CC TARGET_AS TARGET_LD
 }
 
 function set_simulator() {
-  set_tool_path "$1"
+  set_tool_path ${SIMULATOR:-$1}
   SIMULATOR="$TOOL"
   export SIMULATOR
 }
@@ -222,9 +222,10 @@ function set_simulator() {
 function add_script_env() {
   local var="$1"
 
-  case "$2" in
-    *$var*) echo "$var=\${\$$var:-`eval \$$var`}"
-  esac
+  if fgrep -q "$1"
+  then
+    eval "echo $var=\\\${$var:-\$$var}"
+  fi
 }
 
 function create_launch_scripts() {
@@ -249,17 +250,17 @@ EOF
     local test=`basename "$t" $test_ext` 
     local dir=`dirname "$t"`
     local launcher="$dir/$test.sh"
-    local script=`get_script_source $test`
+    local script=`get_script_source "$test"`
 
     cat <<EOF >"$launcher"
 #!/bin/sh
 
 set -evx
 `
-add_script_env TARGET_CC '$script'
-add_script_env TARGET_AS '$script'
-add_script_env TARGET_LD '$script'
-add_script_env SIMULATOR '$script'`
+echo $script | add_script_env TARGET_CC
+echo $script | add_script_env TARGET_AS
+echo $script | add_script_env TARGET_LD 
+echo $script | add_script_env SIMULATOR`
 
 cd '$dir'
 $script
