@@ -10,7 +10,7 @@ function error() {
 }
 
 function get_timestamp() {
-  date '+%d%H%M%S'
+  date '+%y%m%d%H%M%S'
 }
 
 function quote_space() {
@@ -23,6 +23,7 @@ function quote_space() {
 #
 DDIR=`cd "$DDIR"; pwd -P`
 QDIR=`echo "$DDIR" | quote_space`
+TIMESTAMP=`get_timestamp`
 mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/tmp "$DDIR"/usr/bin
 
 # Checking DDIR is set by the caller
@@ -64,6 +65,7 @@ test "$CLEAN_ENV" = true || exec env -i CLEAN_ENV=true \
   SVN_SSH="ssh -p $SSH_PORT" \
   SIMULATOR=${SIMULATOR} \
   TARGET_CC=${TARGET_CC} \
+  RESULT_DIR=${RESULT_DIR} \
   SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
   SSH_AGENT_PID="$SSH_AGENT_PID" \
   sh -evx "$0" "$@"
