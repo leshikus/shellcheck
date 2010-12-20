@@ -280,6 +280,6 @@ function evaluate_log() (
   echo "Tests completed:"
   wc -l successful.list failure.list
   wc -l expected_fail.list unexpected_fail.list
-  test -s unexpected_fail.list
+  test ! -s unexpected_fail.list
 )
 
