@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Detect errors
-set -evx
+set -e
 
 # Environment functions
 function error() {
@@ -30,8 +30,11 @@ function pass_env() {
 #
 DDIR=`cd "$DDIR"; pwd -P`
 QDIR=`echo "$DDIR" | quote_space`
+JOB=${JOB:-`basename "$0" .sh`}
 TIMESTAMP=`get_timestamp`
-mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/tmp "$DDIR"/usr/bin
+RESULT_DIR="$DDIR/result/${JOB}_$TIMESTAMP"
+LOG="$RESULT_DIR/${JOB}_$TIMESTAMP.log"
+mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/tmp "$DDIR"/usr/bin "$RESULT_DIR"
 
 # Checking DDIR is set by the caller
 ERR_MESSAGE="You should set DDIR variable before calling DDIR/config.sh or DDIR/util.sh"
@@ -39,7 +42,7 @@ fgrep "$ERR_MESSAGE" "$DDIR"/config.sh || error "$ERR_MESSAGE"
 
 # Run an upper level config if any
 USER=${USER:-hudson}
-CONFIG='SIMULATOR TARGET_CC TARGET_AS TARGET_LD RESULT_DIR'
+CONFIG='SIMULATOR TARGET_CC TARGET_AS TARGET_LD JOB RESULT_DIR'
 
 if test -f "$DDIR"/../config.sh
 then
@@ -75,5 +78,5 @@ test "$CLEAN_ENV" = true || exec env -i CLEAN_ENV=true \
   SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
   SSH_AGENT_PID="$SSH_AGENT_PID" \
   `pass_env $CONFIG` \
-  sh -evx "$0" "$@"
+  sh -e$- "$0" "$@" 2>&1 | tee "$LOG"
 
