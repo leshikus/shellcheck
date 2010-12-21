@@ -32,7 +32,7 @@ DDIR=`cd "$DDIR"; pwd -P`
 QDIR=`echo "$DDIR" | quote_space`
 JOB=${JOB:-`basename "$0" .sh`}
 TIMESTAMP=`get_timestamp`
-RESULT_DIR="$DDIR/result/${JOB}_$TIMESTAMP"
+RESULT_DIR="${RESULT_DIR:-$DDIR/result/${JOB}_$TIMESTAMP}"
 LOG="$RESULT_DIR/${JOB}_$TIMESTAMP.log"
 mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/tmp "$DDIR"/usr/bin "$RESULT_DIR"
 
