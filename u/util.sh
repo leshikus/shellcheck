@@ -16,7 +16,7 @@ function set_tmp_file_name() {
   TMP_FILE="$DDIR"/tmp/"$1".`get_timestamp`
 }
 
-add_line() {
+function add_line() {
   grep -Fx "$1" "$2" || echo "$1" >>"$2"
 }
 
@@ -233,7 +233,6 @@ function create_launch_scripts() {
   local test_ext="$2"
   shift 2
 
-  mkdir -p "$RESULT_DIR"
   cat <<EOF
 function pass() {
   echo "\$1" >>'$RESULT_DIR'/successful.list
@@ -249,13 +248,13 @@ EOF
   do
     local test=`basename "$t" $test_ext` 
     local dir=`dirname "$t"`
-    local launcher="$dir/$test.sh"
+    local launcher="$dir/test_$test.sh"
     local script=`get_script_source "$test"`
 
     cat <<EOF >"$launcher"
 #!/bin/sh
 
-set -evx
+set -e
 `
 echo $script | add_script_env TARGET_CC
 echo $script | add_script_env TARGET_AS
@@ -265,7 +264,7 @@ echo $script | add_script_env SIMULATOR`
 cd '$dir'
 $script
 EOF
-    echo "sh '$launcher' && pass '$t' || fail '$t'"
+    echo "sh -e$- '$launcher' && pass '$t' || fail '$t'"
   done
 }
 
