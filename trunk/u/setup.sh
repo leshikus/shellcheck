@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "$DDIR"/util.sh
+. "$DDIR"/config.sh
 
 #
 # Settings
