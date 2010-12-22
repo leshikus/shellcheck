@@ -22,12 +22,18 @@ function add_line() {
 
 function rm_subdir() {
   test -d "$DDIR/$1" || error "No such dir: $1"
-  test -n "$1" || error "Empty subdir: $1"
-  test -n "$2" || error "Empty subdir: $2"
+  test -n "$1" || error "Empty subdir: \$1"
+  test -n "$2" || error "Empty subdir: \$2"
   RDD="$DDIR/$1"/"$2"
   test -d "$RDD" || return 0 # no need to remove empty directory
   touch "$RDD" || error "No permission to modify: $RDD"
   rm -rf "$RDD"
+}
+
+function rm_svn_subdir() {
+  test -n "$1" || error "Empty svn subdir: \$1"
+  test -d "$1/.svn" || error "Non-svn subdir: $1"
+  rm -rf "$1"
 }
 
 #
