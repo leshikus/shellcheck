@@ -26,7 +26,23 @@ fgrep "$ERR_MESSAGE" "$DDIR"/config.sh || error "$ERR_MESSAGE"
 
 # Run an upper level config if any
 USER=${USER:-hudson}
-CONFIG='SIMULATOR TARGET_CC TARGET_AS TARGET_LD JOB RESULT_DIR'
+HOME=${HOME:-/home/hudson}
+LANG=
+
+# Allowed environment, other vars are reset
+CONFIG='
+USER
+HOME
+LANG
+SIMULATOR
+TARGET_CC
+TARGET_AS
+TARGET_LD
+JOB
+RESULT_DIR
+SVN_SSH
+SSH_AUTH_SOCK
+SSH_AGENT_PID'
 
 if test -f "$DDIR"/../config.sh
 then
@@ -36,9 +52,9 @@ fi
 # Calculated varaibles
 SSH_ID=${SSH_ID:-$USER@$SSH_SERVER}
 SSH_PORT=${SSH_PORT:-22}
+SVN_SSH="ssh -p $SSH_PORT"
 
-echo '+++ System'
-uname -a
+uname -a # System
 ARCH=`arch`
 if test "$ARCH" = i686
 then
@@ -48,18 +64,5 @@ then
   ARCH_BITS=64 
 fi
 
-# Setting PATH so installed tools have a priority
-test "$CLEAN_ENV" = true || exec env -i CLEAN_ENV=true \
-  USER=$USER \
-  HOME=${HOME:-/home/hudson} \
-  LANG='' \
-  PATH="$DDIR/usr/bin:$DDIR/bin:/bin:/usr/bin" \
-  LDFLAGS="-L$QDIR/usr/lib" \
-  CPPFLAGS="-I$QDIR/usr/include" \
-  LD_LIBRARY_PATH="$DDIR/usr/lib" \
-  SVN_SSH="ssh -p $SSH_PORT" \
-  SSH_AUTH_SOCK="$SSH_AUTH_SOCK" \
-  SSH_AGENT_PID="$SSH_AGENT_PID" \
-  `pass_env $CONFIG` \
-  sh -e$- "$0" "$@" 2>&1 | tee "$LOG"
+restart_clean_env "$@"
 
