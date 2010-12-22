@@ -1,12 +1,28 @@
 #!/bin/sh
 
-. "$DDIR"/config.sh
+# Environment functions
+function error() {
+  echo "$1"
+  exit 1
+}
 
-echo '+++ System'
-uname -a
+function get_timestamp() {
+  date '+%y%m%d%H%M%S'
+}
+
+function quote_space() {
+  sed -e 's/ /\\ /g'
+}
+
+function pass_env() {
+  for e in $@
+  do
+    eval "echo $e=\${$e}"
+  done
+}
 
 #
-# Generic Functions
+# Filesystem
 #
 function get_script_dir() {
   readlink -f `dirname "$0"`

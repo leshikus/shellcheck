@@ -1,34 +1,18 @@
 #!/bin/sh
 
+# Software URL Bases
+GNU_URL=${GNU_URL:-http://mirrors.kernel.org/gnu}
+
 # Detect errors
 set -e
-
-# Environment functions
-function error() {
-  echo "$1"
-  exit 1
-}
-
-function get_timestamp() {
-  date '+%y%m%d%H%M%S'
-}
-
-function quote_space() {
-  sed -e 's/ /\\ /g'
-}
-
-function pass_env() {
-  for e in $@
-  do
-    eval "echo $e=\${$e}"
-  done
-}
 
 #   Working directories
 # DDIR this file script location
 # QDIR the quoted version of DDIR
 #
 DDIR=`cd "$DDIR"; pwd -P`
+. "$DDIR"/util.sh
+
 QDIR=`echo "$DDIR" | quote_space`
 JOB=${JOB:-`basename "$0" .sh`}
 TIMESTAMP=`get_timestamp`
@@ -49,13 +33,12 @@ then
   . "$DDIR"/../config.sh
 fi
   
-# Software URL Bases
-GNU_URL=${GNU_URL:-http://mirrors.kernel.org/gnu}
-
 # Calculated varaibles
 SSH_ID=${SSH_ID:-$USER@$SSH_SERVER}
 SSH_PORT=${SSH_PORT:-22}
 
+echo '+++ System'
+uname -a
 ARCH=`arch`
 if test "$ARCH" = i686
 then
