@@ -17,8 +17,24 @@ function quote_space() {
 function pass_env() {
   for e in $@
   do
-    eval "echo $e=\${$e}"
+    eval "\'echo $e=\${$e}\'"
   done
+}
+
+function restart_clean_env() {
+  test "$CLEAN_ENV" = true || {
+    local passed_env=`pass_env $CONFIG`
+    env -i CLEAN_ENV=true \
+    LANG='' \
+    PATH="$DDIR/usr/bin:$DDIR/bin:/bin:/usr/bin" \
+    LDFLAGS="-L$QDIR/usr/lib" \
+    CPPFLAGS="-I$QDIR/usr/include" \
+    LD_LIBRARY_PATH="$DDIR/usr/lib" \
+    SVN_SSH="ssh -p $SSH_PORT" \
+    $passed_env \
+    sh -e$- "$0" "$@" 2>&1 | tee "$LOG"
+    exit $? # stop here, exec doesn't work with tee
+  }
 }
 
 #
