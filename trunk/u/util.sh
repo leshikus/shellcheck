@@ -14,38 +14,54 @@ function quote_space() {
   sed -e 's/ /\\ /g'
 }
 
-function pass_env() {
-  for e in $@
-  do
-    eval "\'echo $e=\${$e}\'"
-  done
-}
-
 function restart_clean_env() {
   test "$CLEAN_ENV" = true || {
-    local passed_env=`pass_env $CONFIG`
-    env -i CLEAN_ENV=true \
-    LANG='' \
-    PATH="$DDIR/usr/bin:$DDIR/bin:/bin:/usr/bin" \
-    LDFLAGS="-L$QDIR/usr/lib" \
-    CPPFLAGS="-I$QDIR/usr/include" \
-    LD_LIBRARY_PATH="$DDIR/usr/lib" \
-    SVN_SSH="ssh -p $SSH_PORT" \
-    $passed_env \
-    sh -e$- "$0" "$@" 2>&1 | tee "$LOG"
-    exit $? # stop here, exec doesn't work with tee
+    local log="$RESULT_DIR/$JOBSTAMP.log"
+
+    set_tmp_file_name restart.sh
+    {
+      echo exec env -i CLEAN_ENV=true LANG= \\
+      for e in $CONFIG
+      do
+        echo "  $e=\"\${$e}\" \\"
+      done
+      if tty >/dev/null
+      then
+        echo "  sh -e -c 'sh -e$- \"$0\" " "$@" " 2>&1 | tee \"$log\"'" 
+      else
+        echo "  sh -e$- '$0' " "$@" " 1>'$log' 2>&1"
+      fi
+    } >"$TMP_FILE"
+    . "$TMP_FILE"
   }
 }
 
 #
 # Filesystem
 #
+function make_working_directories() {
+  # Check DDIR is set by the caller
+  ERR_MESSAGE="You should set DDIR variable before calling DDIR/config.sh"
+  fgrep "$ERR_MESSAGE" "$DDIR"/util.sh || error "$ERR_MESSAGE"
+
+  # Set job identifiers
+  JOB=${JOB:-`basename "$0" .sh`}
+  TIMESTAMP=`get_timestamp`
+  JOBSTAMP="${JOB}_$TIMESTAMP"
+
+  # Define working directories
+  QDIR=`echo "$DDIR" | quote_space`
+  RESULT_DIR="${RESULT_DIR:-$DDIR/result/$JOBSTAMP}"
+  TMP_DIR="${TMP_DIR:-$DDIR/tmp/$JOBSTAMP}"
+  mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$RESULT_DIR" "$TMP_DIR"
+}
+
 function get_script_dir() {
   readlink -f `dirname "$0"`
 }
 
 function set_tmp_file_name() {
-  TMP_FILE="$DDIR"/tmp/"$1".`get_timestamp`
+  TMP_FILE="$DDIR/tmp/$JOBSTAMP/$1"
 }
 
 function add_line() {
