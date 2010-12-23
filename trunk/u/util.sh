@@ -1,7 +1,21 @@
 #!/bin/sh
 
+#
+# Debug
+#
+function stack_dump() {
+  local counter=${#FUNCNAME[@]}
+  echo Stack dump:
+    
+  while counter=`expr $counter - 1`
+  do
+    echo "$counter ${BASH_SOURCE[$counter]}: ${BASH_LINENO[$counter - 1]}: ${FUNCNAME[$counter]}"
+  done
+}
+
 # Environment functions
 function error() {
+  stack_dump
   echo "$1"
   exit 1
 }
