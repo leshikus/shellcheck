@@ -59,8 +59,8 @@ sub hdl_char {
     my ($p, $str) = @_;
     if (($scm == 1) and ($remote == 1)) {
         # Extract port
-        $svn_command = ($str =~ s/^(svn\+ssh:\/\/[^\/:]+):(\d+)/\1/) ?
-          "SVN_SSH='ssh -p $2' " : '';
+        $svn_command = ($str =~ s/^(svn\+ssh:\/\/)(?:[^\/:]+@)?([^\/:]+):(\d+)/\1\$USER@\2/) ?
+          "SVN_SSH='ssh -p $3' " : '';
         $svn_command .= "svn checkout $str";
         $svn_dir = basename($str);
     } elsif (($scm == 1) and ($local == 1)) {
