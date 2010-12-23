@@ -41,9 +41,9 @@ function restart_clean_env() {
       done
       if tty >/dev/null
       then
-        echo "  sh -e -c 'sh -e$- \"$0\" " "$@" " 2>&1 | tee \"$log\"'" 
+        echo "  sh -e -c 'sh -e$- \"$SCRIPT\" " "$@" " 2>&1 | tee \"$log\"'" 
       else
-        echo "  sh -e$- '$0' " "$@" " 1>'$log' 2>&1"
+        echo "  sh -e$- '$SCRIPT' " "$@" " 1>'$log' 2>&1"
       fi
     } >"$TMP_FILE"
     . "$TMP_FILE"
@@ -59,6 +59,7 @@ function make_working_directories() {
   fgrep "$ERR_MESSAGE" "$DDIR"/util.sh || error "$ERR_MESSAGE"
 
   # Set job identifiers
+  SCRIPT=`readlink -f "$0"`
   JOB=${JOB:-`basename "$0" .sh`}
   TIMESTAMP=`get_timestamp`
   JOBSTAMP="${JOB}_$TIMESTAMP"
@@ -137,12 +138,10 @@ function build_dist() {
   )
 }
 
-function test_dist() {
-  (
-    cd "$DDIR/dist/$DIST_DIR"
-    make check
-  )
-}
+function test_dist() (
+  cd "$DDIR/dist/$DIST_DIR"
+  make check
+)
 
 # 0 if the file was not downloaded
 function wget_newer() {
