@@ -8,7 +8,7 @@ GNU_URL=${GNU_URL:-http://mirrors.kernel.org/gnu}
 #
 # Detect errors
 #
-set -e
+set -e -o pipefail
 
 #
 # Load functions
