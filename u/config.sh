@@ -1,39 +1,41 @@
 #!/bin/sh
 
+#
 # Software URL Bases
+#
 GNU_URL=${GNU_URL:-http://mirrors.kernel.org/gnu}
 
+#
 # Detect errors
+#
 set -e
 
-#   Working directories
-# DDIR this file script location
-# QDIR the quoted version of DDIR
+#
+# Load functions
 #
 DDIR=`cd "$DDIR"; pwd -P`
 . "$DDIR"/util.sh
 
-QDIR=`echo "$DDIR" | quote_space`
-JOB=${JOB:-`basename "$0" .sh`}
-TIMESTAMP=`get_timestamp`
-RESULT_DIR="${RESULT_DIR:-$DDIR/result/${JOB}_$TIMESTAMP}"
-LOG="$RESULT_DIR/${JOB}_$TIMESTAMP.log"
-mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/tmp "$DDIR"/usr/bin "$RESULT_DIR"
+make_working_directories
 
-# Checking DDIR is set by the caller
-ERR_MESSAGE="You should set DDIR variable before calling DDIR/config.sh or DDIR/util.sh"
-fgrep "$ERR_MESSAGE" "$DDIR"/config.sh || error "$ERR_MESSAGE"
-
-# Run an upper level config if any
+#
+# Set user environment
+#
 USER=${USER:-hudson}
 HOME=${HOME:-/home/hudson}
 LANG=
 
+#
 # Allowed environment, other vars are reset
+#
 CONFIG='
 USER
 HOME
-LANG
+PATH
+CCFLAGS
+CPPFLAGS
+LDFLAGS
+LD_LIBRARY_PATH
 SIMULATOR
 TARGET_CC
 TARGET_AS
@@ -44,6 +46,7 @@ SVN_SSH
 SSH_AUTH_SOCK
 SSH_AGENT_PID'
 
+# Run an upper level config if any
 if test -f "$DDIR"/../config.sh
 then
   . "$DDIR"/../config.sh
@@ -63,6 +66,14 @@ elif test "$ARCH" = x86_64
 then
   ARCH_BITS=64 
 fi
+
+#
+# Tool settings
+#
+PATH="$DDIR/usr/bin:$DDIR/bin:/bin:/usr/bin"
+LDFLAGS="-L$QDIR/usr/lib"
+CPPFLAGS="-I$QDIR/usr/include"
+LD_LIBRARY_PATH="$DDIR/usr/lib"
 
 restart_clean_env "$@"
 
