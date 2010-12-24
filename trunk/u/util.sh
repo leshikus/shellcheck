@@ -272,9 +272,11 @@ function set_cc() {
   set_tool_path ${TARGET_CC:-$1}
 
   TARGET_CC="$TOOL"
-  TARGET_AS=${TARGET_AS:-`echo "$TOOL" | sed -e 's/g\?cc$/as/'`}
-  TARGET_LD=${TARGET_LD:-`echo "$TOOL" | sed -e 's/g\?cc$/ld/'`}
-  export TARGET_CC TARGET_AS TARGET_LD
+  CROSS_COMPILE=`echo "$TOOL" | sed -e 's/g\?cc$//'`
+  TARGET_AS="${TARGET_AS:-${CROSS_COMPILE}as}"
+  TARGET_LD="${TARGET_LD:-${CROSS_COMPILE}ld}"
+  
+  export CROSS_COMPILE TARGET_CC TARGET_AS TARGET_LD
 }
 
 function set_simulator() {
