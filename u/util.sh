@@ -99,6 +99,12 @@ function rm_svn_subdir() {
   rm -rf "$1"
 }
 
+function rm_tmp() {
+  test -n "$DDIR" || error "DDIR is empty"
+  test -d "$DDIR"/tmp || error "No such dir, $DDIR/tmp"
+  find "$DDIR"/tmp -maxdepth 1 -atime 2 -exec rm -rf {} \;
+}
+
 #
 # Dependence Download & Build Utilities
 #
@@ -348,6 +354,8 @@ function evaluate_log() (
   echo "Tests completed:"
   wc -l successful.list failure.list
   wc -l expected_fail.list unexpected_fail.list
+  echo "Unexpected failures:"
+  cat unexpected_fail.list
   test ! -s unexpected_fail.list
 )
 
