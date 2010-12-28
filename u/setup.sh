@@ -37,7 +37,7 @@ function install_plugins {
   
   mkdir -p $plugins_dir
 
-  wget_newer http://hudson-ci.org/latest/email-ext.hpi
+  wget_newer http://hudson-ci.org/latest/email-ext.hpi || true
   mv "$DDIR"/timestamp/email-ext.hpi $plugins_dir 
 }
 
@@ -51,7 +51,7 @@ check_server
 hide_sensitive_data
 
 if [ "$1" != "--nostart" ]; then
-  install_plugins
+  install_plugins 
 
   # Update Hudson
   wget_dist "$HUDSON_URL"
