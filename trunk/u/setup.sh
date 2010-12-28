@@ -50,11 +50,13 @@ check_server
 
 hide_sensitive_data
 
-install_plugins
+if [ "$1" != "--nostart" ]; then
+  install_plugins
 
-# Update Hudson
-wget_dist "$HUDSON_URL"
+  # Update Hudson
+  wget_dist "$HUDSON_URL"
 
-# Launch Hudson
-java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
+  # Launch Hudson
+  java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
+fi
 
