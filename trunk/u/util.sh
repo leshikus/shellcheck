@@ -56,7 +56,7 @@ function restart_clean_env() {
 function make_working_directories() {
   # Check DDIR is set by the caller
   ERR_MESSAGE="You should set DDIR variable before calling DDIR/config.sh"
-  fgrep "$ERR_MESSAGE" "$DDIR"/util.sh || error "$ERR_MESSAGE"
+  fgrep -q "$ERR_MESSAGE" "$DDIR"/util.sh || error "$ERR_MESSAGE"
 
   # Set job identifiers
   SCRIPT=`readlink -f "$0"`
