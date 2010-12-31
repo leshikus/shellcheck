@@ -67,16 +67,28 @@ function make_working_directories() {
   # Define working directories
   QDIR=`echo "$DDIR" | quote_space`
   RESULT_DIR="${RESULT_DIR:-$DDIR/result/$JOBSTAMP}"
-  TMP_DIR="${TMP_DIR:-$DDIR/tmp/$JOBSTAMP}"
-  mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$RESULT_DIR" "$TMP_DIR"
+  TMP_DIR="${TMP_DIR:-/tmp/$USER}"
+  TMP_JDIR="$TMP_DIR/$JOBSTAMP"
+  HUDSON_HOME="$DDIR"/../hudson_home
+  JDIR="$HUDSON_HOME/jobs/$JOB"
+  mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$RESULT_DIR" "$TMP_JDIR" "$TMP_DIR"/workspace "$HUDSON_HOME"/jobs/$JOB
+
+   # Relink workspace directories
+   ln -fs "$TMP_DIR"/workspace "$HUDSON_HOME"/jobs/$JOB
 }
 
 function get_script_dir() {
   readlink -f `dirname "$0"`
 }
 
+function test_dir() {
+  test -n "$1" || error "The directory is not set"
+  test -d "$1" || error "The directory doesn't exist: $1"
+}
+
 function set_tmp_file_name() {
-  TMP_FILE="$DDIR/tmp/$JOBSTAMP/$1"
+  test_dir "$TMP_JDIR"
+  TMP_FILE="$TMP_JDIR/$1"
 }
 
 function add_line() {
@@ -84,7 +96,7 @@ function add_line() {
 }
 
 function rm_subdir() {
-  test -d "$DDIR/$1" || error "No such dir: $1"
+  test_dir "$DDIR/$1"
   test -n "$1" || error "Empty subdir: \$1"
   test -n "$2" || error "Empty subdir: \$2"
   RDD="$DDIR/$1"/"$2"
@@ -94,15 +106,15 @@ function rm_subdir() {
 }
 
 function rm_svn_subdir() {
-  test -n "$1" || error "Empty svn subdir: \$1"
+  test_dir "$1"
   test -d "$1/.svn" || error "Non-svn subdir: $1"
   rm -rf "$1"
 }
 
-function rm_tmp() {
-  test -n "$DDIR" || error "DDIR is empty"
-  test -d "$DDIR"/tmp || error "No such dir, $DDIR/tmp"
-  find "$DDIR"/tmp -maxdepth 1 -atime 2 -exec rm -rf {} \;
+function clean_tmp() {
+  test_dir "$TMP_DIR"
+  echo "$TMP_DIR" | fgrep -q "/tmp" || error "Is not a temporary directory: $TMP_DIR"
+  find "$TMP_DIR" -maxdepth 1 -atime 2 -exec rm -rf {} \;
 }
 
 #
@@ -357,5 +369,23 @@ function evaluate_log() (
   echo "Unexpected failures:"
   cat unexpected_fail.list
   test ! -s unexpected_fail.list
+)
+
+#
+# Configure Hudson
+# 
+function hudson_hide_sensitive_data() {
+  # Keep private keys safe
+  local keydir="$HUDSON_HOME"/subversion-credentials
+  mkdir -p "$keydir"
+  chmod 700 "$keydir"
+}
+
+function hudson_update_workspace() (
+  cd "$JDIR"
+  perl ../../../u/parse_hudson_config.pl <config.xml >svn_update.sh
+
+  cd workspace
+  . "$JDIR"/svn_update.sh
 )
 

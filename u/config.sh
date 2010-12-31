@@ -4,6 +4,7 @@
 # Software URL Bases
 #
 GNU_URL=${GNU_URL:-http://mirrors.kernel.org/gnu}
+HUDSON_URL=http://hudson.gotdns.com/latest/hudson.war
 
 #
 # Detect errors

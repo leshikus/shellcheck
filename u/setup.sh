@@ -5,9 +5,6 @@
 #
 # Settings
 #
-HUDSON_URL=http://hudson.gotdns.com/latest/hudson.war
-HUDSON_HOME="$DDIR"/../hudson_home
-HUDSON_KEY_DIR="$HUDSON_HOME"/subversion-credentials
 KEY_NAME="$HOME"/.ssh/id_rsa
 
 #
@@ -23,12 +20,6 @@ function check_server() {
   cat "$KEY_NAME".pub |
     ssh -p $SSH_PORT $SSH_ID \
     'read key; grep -Fx "$key" $HOME/.ssh/authorized_keys2 || echo "$key" >>$HOME/.ssh/authorized_keys2'
-}
-
-function hide_sensitive_data() {
-  # Keep private keys safe
-  mkdir -p "$HUDSON_KEY_DIR"
-  chmod 700 "$HUDSON_KEY_DIR"
 }
 
 function install_plugins {
@@ -48,7 +39,7 @@ generate_ssh_keypair
 
 check_server
 
-hide_sensitive_data
+hudson_hide_sensitive_data
 
 if [ "$1" != "--nostart" ]; then
   install_plugins 
