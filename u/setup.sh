@@ -28,8 +28,10 @@ function install_plugins {
   
   mkdir -p $plugins_dir
 
-  wget_newer http://hudson-ci.org/latest/email-ext.hpi || true
-  mv "$DDIR"/timestamp/email-ext.hpi $plugins_dir 
+
+   wget_newer http://mirrors.ibiblio.org/pub/mirrors/maven2/org/jvnet/hudson/plugins/email-ext/2.9/email-ext-2.9.hpi || true
+
+  mv "$DDIR"/timestamp/email-ext-2.9.hpi $plugins_dir/email-ext.hpi 
 }
 
 #
