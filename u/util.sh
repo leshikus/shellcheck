@@ -34,7 +34,7 @@ function restart_clean_env() {
 
     set_tmp_file_name restart.sh
     {
-      echo exec env -i CLEAN_ENV=true LANG= \\
+      echo exec env -i CLEAN_ENV=true LANG=en_US.UTF-8 \\
       for e in $CONFIG
       do
         echo "  $e=\"\${$e}\" \\"
@@ -61,7 +61,7 @@ function make_working_directories() {
   # Set job identifiers
   SCRIPT=`readlink -f "$0"`
   JOB=${JOB:-`basename "$0" .sh`}
-  TIMESTAMP=`get_timestamp`
+  TIMESTAMP=${TIMESTAMP:-`get_timestamp`}
   JOBSTAMP="${JOB}_$TIMESTAMP"
 
   # Define working directories
