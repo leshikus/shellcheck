@@ -21,7 +21,7 @@ function error() {
 }
 
 function get_timestamp() {
-  date '+%y%m%d%H%M%S'
+  date '+%y%m%d_%H%M%S'
 }
 
 function quote_space() {
