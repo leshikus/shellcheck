@@ -24,7 +24,6 @@ make_working_directories
 #
 USER=${USER:-hudson}
 HOME=${HOME:-/home/hudson}
-LANG=
 
 #
 # Allowed environment, other vars are reset
@@ -42,7 +41,9 @@ TARGET_CC
 TARGET_AS
 TARGET_LD
 JOB
+TIMESTAMP
 WORKSPACE_DIR
+TMP_DIR
 RESULT_DIR
 SVN_SSH
 SSH_AUTH_SOCK
