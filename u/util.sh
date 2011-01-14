@@ -372,6 +372,13 @@ function evaluate_log() (
   test ! -s unexpected_fail.list
 )
 
+function create_and_run_tests() (
+  cd "$WORKSPACE_DIR"
+  create_launch_scripts "$@" >"$JDIR"/launch_scripts.sh
+  . "$JDIR"/launch_scripts.sh
+  evaluate_log
+)
+
 #
 # Configure Hudson
 # 
