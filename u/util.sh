@@ -71,10 +71,11 @@ function make_working_directories() {
   TMP_JDIR="$TMP_DIR/$JOBSTAMP"
   HUDSON_HOME="$DDIR"/../hudson_home
   JDIR="$HUDSON_HOME/jobs/$JOB"
+  WORKSPACE_DIR="${WORKSPACE_DIR:-$TMP_DIR/workspace}"
   mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$RESULT_DIR" "$TMP_JDIR" "$TMP_DIR"/workspace "$HUDSON_HOME"/jobs/$JOB
 
-   # Relink workspace directories
-   ln -fs "$TMP_DIR"/workspace "$HUDSON_HOME"/jobs/$JOB
+  # Relink workspace directories
+  ln -fs "$WORKSPACE_DIR" "$HUDSON_HOME"/jobs/$JOB
 }
 
 function get_script_dir() {
