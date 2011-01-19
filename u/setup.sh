@@ -42,11 +42,14 @@ check_server
 
 hudson_hide_sensitive_data
 
+hudson_relink_workspaces
+
 if [ "$1" != "--nostart" ]; then
-  install_plugins 
 
   # Update Hudson
   wget_dist "$HUDSON_URL"
+
+  install_plugins 
 
   # Launch Hudson
   java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war

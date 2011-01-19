@@ -34,7 +34,7 @@ function restart_clean_env() {
 
     set_tmp_file_name restart.sh
     {
-      echo exec env -i CLEAN_ENV=true LANG=en_US.UTF-8 \\
+      echo exec env -i CLEAN_ENV=true LANG= \\
       for e in $CONFIG
       do
         echo "  $e=\"\${$e}\" \\"
@@ -53,10 +53,22 @@ function restart_clean_env() {
 #
 # Filesystem
 #
+function relink_job_workspace() {
+  local job="$1"
+  local workspace_dir="$TMP_DIR/${job}_workspace"
+  local local_workspace="$HUDSON_HOME/jobs/$job"/workspace
+
+  ln -fs "$workspace_dir" "$local_workspace" || error "$local_workspace exists, please delete and re-link workspace directories"
+  mkdir -p "$workspace_dir"
+}
+
+function check_DDIR_is_set() {
+  local err_message="You should set DDIR variable before calling DDIR/config.sh"
+  fgrep -q "$err_message" "$DDIR"/util.sh || error "$err_message"
+}
+
 function make_working_directories() {
-  # Check DDIR is set by the caller
-  ERR_MESSAGE="You should set DDIR variable before calling DDIR/config.sh"
-  fgrep -q "$ERR_MESSAGE" "$DDIR"/util.sh || error "$ERR_MESSAGE"
+  check_DDIR_is_set
 
   # Set job identifiers
   SCRIPT=`readlink -f "$0"`
@@ -71,11 +83,10 @@ function make_working_directories() {
   TMP_JDIR="$TMP_DIR/$JOBSTAMP"
   HUDSON_HOME="$DDIR"/../hudson_home
   JDIR="$HUDSON_HOME/jobs/$JOB"
-  WORKSPACE_DIR="${WORKSPACE_DIR:-$TMP_DIR/workspace}"
+  WORKSPACE_DIR="${WORKSPACE_DIR:-$HUDSON_HOME/jobs/$JOB/workspace}"
   mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$RESULT_DIR" "$TMP_JDIR" "$TMP_DIR"/workspace "$HUDSON_HOME"/jobs/$JOB
 
-  # Relink workspace directories
-  ln -fs "$WORKSPACE_DIR" "$HUDSON_HOME"/jobs/$JOB
+  relink_job_workspace $JOB
 }
 
 function get_script_dir() {
@@ -387,6 +398,15 @@ function hudson_hide_sensitive_data() {
   local keydir="$HUDSON_HOME"/subversion-credentials
   mkdir -p "$keydir"
   chmod 700 "$keydir"
+}
+
+function hudson_relink_workspaces() {
+  local job_dir
+  for job_dir in "$HUDSON_HOME"/jobs/*
+  do
+    local job=`dirname "$job_dir"`
+    relink_job_workspace "$job"
+  done
 }
 
 function hudson_update_workspace() (
