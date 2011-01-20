@@ -29,12 +29,12 @@ function quote_space() {
 }
 
 function restart_clean_env() {
-  test "$CLEAN_ENV" = true || {
+  test "$TNIX_CLEAN_ENV" = true || {
     local log="$RESULT_DIR/$JOBSTAMP.log"
 
     set_tmp_file_name restart.sh
     {
-      echo exec env -i CLEAN_ENV=true LANG= \\
+      echo exec env -i TNIX_CLEAN_ENV=true LANG= \\
       for e in $CONFIG
       do
         echo "  $e=\"\${$e}\" \\"
