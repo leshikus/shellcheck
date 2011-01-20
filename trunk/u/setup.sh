@@ -49,7 +49,7 @@ case " $* " in
   *)
     wget_dist "$HUDSON_URL"
     install_plugins 
-    java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
+    env - "$JAVA_HOME"/bin/java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
     ;;
 esac
 

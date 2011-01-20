@@ -72,16 +72,42 @@ function check_DDIR_is_set() {
   fgrep -q "$err_message" "$DDIR"/util.sh || error "$err_message"
 }
 
-function make_working_directories() {
-  check_DDIR_is_set
+function set_java_home() {
+  if test -x "$JAVA_HOME"/bin/java
+  then return
+  fi
+  local path=`which java`
+  path=`readlink -f "$path"`
+  JAVA_HOME=`echo $path | sed -s 's#/bin/java$##'`
+}
 
-  # Set job identifiers
+function set_arch() {
+  uname -a
+  ARCH=`arch`
+  if test "$ARCH" = i686
+  then
+    ARCH_BITS=32
+  elif test "$ARCH" = x86_64
+  then
+    ARCH_BITS=64
+  fi
+}
+
+function run_upper_level_config() {
+  if test -f "$DDIR"/../config.sh
+  then
+    . "$DDIR"/../config.sh
+  fi
+}
+
+function set_job_identifiers() {
   SCRIPT=`readlink -f "$0"`
   JOB=${JOB:-`basename "$0" .sh`}
   TIMESTAMP=${TIMESTAMP:-`get_timestamp`}
   JOBSTAMP="${JOB}_$TIMESTAMP"
+}
 
-  # Define working directories
+function set_working_directories() {
   QDIR=`echo "$DDIR" | quote_space`
   RESULT_DIR="${RESULT_DIR:-$DDIR/result/$JOBSTAMP}"
   TMP_DIR="${TMP_DIR:-/tmp/$USER}"
@@ -89,9 +115,27 @@ function make_working_directories() {
   HUDSON_HOME="$DDIR"/../hudson_home
   JDIR="$HUDSON_HOME/jobs/$JOB"
   WORKSPACE_DIR="${WORKSPACE_DIR:-$HUDSON_HOME/jobs/$JOB/workspace}"
-  mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$RESULT_DIR" "$TMP_JDIR" "$TMP_DIR"/workspace "$HUDSON_HOME"/jobs/$JOB
 
+  mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$RESULT_DIR" "$TMP_JDIR" "$TMP_DIR"/workspace "$HUDSON_HOME"/jobs/$JOB
   relink_job_workspace $JOB
+}
+
+function set_toolchain_env() {
+  PATH="$DDIR/usr/bin:$DDIR/bin:/bin:/usr/bin"
+  LDFLAGS="-L$QDIR/usr/lib"
+  CPPFLAGS="-I$QDIR/usr/include"
+  LD_LIBRARY_PATH="$DDIR/usr/lib"
+}
+
+function prepare_env() {
+  set -e -o pipefail
+  check_DDIR_is_set
+  run_upper_level_config
+  set_java_home
+  set_arch
+  set_job_identifiers
+  set_working_directories
+  set_toolchain_env
 }
 
 function get_script_dir() {
