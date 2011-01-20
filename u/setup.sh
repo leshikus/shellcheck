@@ -37,21 +37,20 @@ function install_plugins {
 # Executions starts here
 #
 generate_ssh_keypair
-
 check_server
-
 hudson_hide_sensitive_data
 
-hudson_relink_workspaces
 
-if [ "$1" != "--nostart" ]; then
-
-  # Update Hudson
-  wget_dist "$HUDSON_URL"
-
-  install_plugins 
-
-  # Launch Hudson
-  java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
-fi
+case " $* " in
+  * --relink *)
+    hudson_relink_workspaces
+    ;;
+  * --nostart *)
+    break
+    ;;
+  *)
+    wget_dist "$HUDSON_URL"
+    install_plugins 
+    java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
+esac
 
