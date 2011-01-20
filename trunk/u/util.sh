@@ -58,7 +58,14 @@ function relink_job_workspace() {
   local workspace_dir="$TMP_DIR/${job}_workspace"
   local local_workspace="$HUDSON_HOME/jobs/$job"/workspace
 
-  ln -fs "$workspace_dir" "$local_workspace" || error "$local_workspace exists, please delete and re-link workspace directories"
+  if test -L "$local_workspace"
+  then
+    rm "$local_workspace"
+  elif test -d "$local_workspace"
+  then rm -rf "$local_workspace"
+  fi
+
+  ln -s "$workspace_dir" "$local_workspace"
   mkdir -p "$workspace_dir"
 }
 
@@ -94,8 +101,11 @@ function get_script_dir() {
 }
 
 function test_dir() {
+  local dir="$1"
   test -n "$1" || error "The directory is not set"
-  test -d "$1" || error "The directory doesn't exist: $1"
+  echo "$dir" | grep -q '^/......' || error "$dir is relative or less than six letters"
+  echo "$dir" | grep -vqF '.' || error "$dir has . inside"
+  touch "$dir"/.permission_test || error "$dir has invalid permissions"
 }
 
 function set_tmp_file_name() {
@@ -107,20 +117,17 @@ function add_line() {
   grep -Fx "$1" "$2" || echo "$1" >>"$2"
 }
 
-function rm_subdir() {
-  test_dir "$DDIR/$1"
-  test -n "$1" || error "Empty subdir: \$1"
-  test -n "$2" || error "Empty subdir: \$2"
-  RDD="$DDIR/$1"/"$2"
-  test -d "$RDD" || return 0 # no need to remove empty directory
-  touch "$RDD" || error "No permission to modify: $RDD"
-  rm -rf "$RDD"
+function rm_dir() {
+  local dir="$1"
+
+  test_dir "$1"
+  rm -rf "$dir"
 }
 
 function rm_svn_subdir() {
-  test_dir "$1"
-  test -d "$1/.svn" || error "Non-svn subdir: $1"
-  rm -rf "$1"
+  local dir=`cd $1; pwd -P`
+  test -d "$dir/.svn" || error "Non-svn subdir: $1"
+  rm_dir "$dir"
 }
 
 function clean_tmp() {
@@ -241,7 +248,7 @@ function git_dist() {
       git clean -xdf # delete untracked and ignored files
     else
       cd "$DDIR/dist"
-      rm_subdir dist "$DIST_DIR"
+      rm_dir "$DDIR/dist/$DIST_DIR"
       git clone "$GIT_DIST"
     fi
     build_dist "$DIST_DIR"
