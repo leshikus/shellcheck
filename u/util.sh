@@ -29,25 +29,23 @@ function quote_space() {
 }
 
 function restart_clean_env() {
-  test "$TNIX_CLEAN_ENV" = true || {
+  if test "$1" = --tnix-noconfig
+  then
+    shift
+  else
     local log="$RESULT_DIR/$JOBSTAMP.log"
 
     set_tmp_file_name restart.sh
     {
-      echo exec env -i TNIX_CLEAN_ENV=true LANG= \\
+      echo exec nice env -i LANG= \\
       for e in $CONFIG
       do
         echo "  $e=\"\${$e}\" \\"
       done
-      if tty >/dev/null
-      then
-        echo "  sh -e -c 'sh -e$- \"$SCRIPT\" " "$@" " 2>&1 | tee \"$log\"'" 
-      else
-        echo "  sh -e$- '$SCRIPT' " "$@" " 1>'$log' 2>&1"
-      fi
+      echo "  sh -e -c 'sh -e$- \"$SCRIPT\" --tnix-noconfig " "$@" " 2>&1 | tee \"$log\"'" 
     } >"$TMP_FILE"
     . "$TMP_FILE"
-  }
+  fi
 }
 
 #
