@@ -409,9 +409,10 @@ function hudson_hide_sensitive_data() {
 
 function hudson_relink_workspaces() {
   local job_dir
-  for job_dir in "$HUDSON_HOME"/jobs/*
+  for job_ws_dir in "$HUDSON_HOME"/jobs/*/config.xml
   do
-    local job=`dirname "$job_dir"`
+    local job_dir=`dirname "$job_ws_dir"`
+    local job=`basename "$job_dir"`
     relink_job_workspace "$job"
   done
 }

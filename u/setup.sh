@@ -28,9 +28,7 @@ function install_plugins {
   
   mkdir -p $plugins_dir
 
-
-   wget_newer http://hudson-ci.org/latest/email-ext.hpi || true
-
+  wget_newer http://hudson-ci.org/latest/email-ext.hpi || true
 }
 
 #
@@ -42,15 +40,16 @@ hudson_hide_sensitive_data
 
 
 case " $* " in
-  * --relink *)
+  *\ --relink\ *)
     hudson_relink_workspaces
     ;;
-  * --nostart *)
+  *\ --nostart\ *)
     break
     ;;
   *)
     wget_dist "$HUDSON_URL"
     install_plugins 
     java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
+    ;;
 esac
 
