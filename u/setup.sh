@@ -23,11 +23,9 @@ function check_server() {
 }
 
 function install_plugins {
-  
   local plugins_dir=$HUDSON_HOME/plugins/
   
   mkdir -p $plugins_dir
-
   wget_newer http://hudson-ci.org/latest/email-ext.hpi || true
 }
 
@@ -37,7 +35,6 @@ function install_plugins {
 generate_ssh_keypair
 check_server
 hudson_hide_sensitive_data
-
 
 case " $* " in
   *\ --relink\ *)
@@ -49,7 +46,7 @@ case " $* " in
   *)
     wget_dist "$HUDSON_URL"
     install_plugins 
-    env - "$JAVA_HOME"/bin/java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
+    env - /usr/bin/java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
     ;;
 esac
 
