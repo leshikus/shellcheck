@@ -20,32 +20,8 @@ function error() {
   exit 1
 }
 
-function get_timestamp() {
-  date '+%y%m%d_%H%M%S'
-}
-
 function quote_space() {
   sed -e 's/ /\\ /g'
-}
-
-function restart_clean_env() {
-  if test "$1" = --tnix-noconfig
-  then
-    shift
-  else
-    local log="$RESULT_DIR/$JOBSTAMP.log"
-
-    set_tmp_file_name restart.sh
-    {
-      echo exec nice env -i LANG= \\
-      for e in $CONFIG
-      do
-        echo "  $e=\"\${$e}\" \\"
-      done
-      echo "  sh -e -c 'sh -e$- \"$SCRIPT\" --tnix-noconfig " "$@" " 2>&1 | tee \"$log\"'" 
-    } >"$TMP_FILE"
-    . "$TMP_FILE"
-  fi
 }
 
 #
@@ -53,7 +29,6 @@ function restart_clean_env() {
 #
 function relink_job_workspace() {
   local job="$1"
-  local workspace_dir="$TMP_DIR/${job}_workspace"
   local local_workspace="$HUDSON_HOME/jobs/$job"/workspace
 
   if test -L "$local_workspace"
@@ -63,83 +38,13 @@ function relink_job_workspace() {
   then rm -rf "$local_workspace"
   fi
 
-  ln -s "$workspace_dir" "$local_workspace"
-  mkdir -p "$workspace_dir"
+  ln -s "$WORKSPACE_DIR" "$local_workspace"
+  mkdir -p "$WORKSPACE_DIR"
 }
 
-function check_DDIR_is_set() {
+function check_env() {
   local err_message="You should set DDIR variable before calling DDIR/config.sh"
   fgrep -q "$err_message" "$DDIR"/util.sh || error "$err_message"
-}
-
-function set_java_home() {
-  if test -x "$JAVA_HOME"/bin/java
-  then return
-  fi
-  local path=`which java`
-  path=`readlink -f "$path"`
-  JAVA_HOME=`echo $path | sed -s 's#/bin/java$##'`
-}
-
-function set_arch() {
-  uname -a
-  ARCH=`arch`
-  if test "$ARCH" = i686
-  then
-    ARCH_BITS=32
-  elif test "$ARCH" = x86_64
-  then
-    ARCH_BITS=64
-  fi
-}
-
-function run_upper_level_config() {
-  if test -f "$DDIR"/../config.sh
-  then
-    . "$DDIR"/../config.sh
-  fi
-}
-
-function set_job_identifiers() {
-  SCRIPT=`readlink -f "$0"`
-  JOB=${JOB:-`basename "$0" .sh`}
-  TIMESTAMP=${TIMESTAMP:-`get_timestamp`}
-  JOBSTAMP="${JOB}_$TIMESTAMP"
-}
-
-function set_working_directories() {
-  QDIR=`echo "$DDIR" | quote_space`
-  RESULT_DIR="${RESULT_DIR:-$DDIR/result/$JOBSTAMP}"
-  TMP_DIR="${TMP_DIR:-/tmp/$USER}"
-  TMP_JDIR="$TMP_DIR/$JOBSTAMP"
-  HUDSON_HOME="$DDIR"/../hudson_home
-  JDIR="$HUDSON_HOME/jobs/$JOB"
-  WORKSPACE_DIR="${WORKSPACE_DIR:-$HUDSON_HOME/jobs/$JOB/workspace}"
-
-  mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$RESULT_DIR" "$TMP_JDIR" "$TMP_DIR"/workspace "$HUDSON_HOME"/jobs/$JOB
-  relink_job_workspace $JOB
-}
-
-function set_toolchain_env() {
-  PATH="$DDIR/usr/bin:$DDIR/bin:/bin:/usr/bin"
-  LDFLAGS="-L$QDIR/usr/lib"
-  CPPFLAGS="-I$QDIR/usr/include"
-  LD_LIBRARY_PATH="$DDIR/usr/lib"
-}
-
-function prepare_env() {
-  set -e -o pipefail
-  check_DDIR_is_set
-  run_upper_level_config
-  set_java_home
-  set_arch
-  set_job_identifiers
-  set_working_directories
-  set_toolchain_env
-}
-
-function get_script_dir() {
-  readlink -f `dirname "$0"`
 }
 
 function test_dir() {
@@ -151,8 +56,8 @@ function test_dir() {
 }
 
 function set_tmp_file_name() {
-  test_dir "$TMP_JDIR"
-  TMP_FILE="$TMP_JDIR/$1"
+  test_dir "$TMP_JOB_DIR"
+  TMP_FILE="$TMP_JOB_DIR/$1"
 }
 
 function add_line() {
