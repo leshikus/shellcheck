@@ -1,7 +1,6 @@
 #!/bin/sh
 
 function load_functions() {
-  DDIR=`readlink -f "$DDIR"`
   . "$DDIR"/util.sh
   check_env
 }
@@ -19,6 +18,7 @@ function apply_to_env_config() {
 }
 
 function set_job_env() {
+  DDIR=`readlink -f "$DDIR"`
   SCRIPT=`readlink -f "$0"`
   JOB=`basename "$0" .sh`
 
@@ -41,7 +41,8 @@ function restart_if_needed() {
       ;;
     *)  # incorrect
       echo "JOBSTAMP=$JOBSTAMP does not meet JOB=$JOB name"
-      # exit 1 FIXME  uncomment
+      # exit 1 FIXME  uncomment and delete the next line
+      unset WORKSPACE_DIR RESULT_DIR
       ;;
   esac
   restart_clean_env "$@"
