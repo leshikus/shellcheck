@@ -38,13 +38,13 @@ function restart_if_needed() {
       return;
       ;;
     '') # not set
-      restart_clean_env "$@"
       ;;
     *)  # incorrect
       echo "JOBSTAMP=$JOBSTAMP does not meet JOB=$JOB name"
       # exit 1 FIXME  uncomment
       ;;
   esac
+  restart_clean_env "$@"
 }
 
 function add_config_env() {
