@@ -56,16 +56,20 @@ function add_config_env() {
 
 function restart_clean_env() {
   local jobstamp=${JOB}_`get_timestamp`
-  RESULT_DIR=`readlink -f "${RESULT_DIR:-$DDIR/result/$jobstamp}"`
-  WORKSPACE_DIR=`readlink -f "${WORKSPACE_DIR:-$JDIR/workspace}"`
+  RESULT_DIR="${RESULT_DIR:-$DDIR/result/$jobstamp}"
+  WORKSPACE_DIR="${WORKSPACE_DIR:-$JDIR/workspace}"
+
+  mkdir -p "$TMP_DIR" "$RESULT_DIR" "$WORKSPACE_DIR"
+  TMP_DIR=`readlink -f "$TMP_DIR"`
+  RESULT_DIR=`readlink -f "$RESULT_DIR"`
+  WORKSPACE_DIR=`readlink -f "$WORKSPACE_DIR"`
+
   local log="$RESULT_DIR/$jobstamp.log"
   local start="$RESULT_DIR/$JOB"
-  mkdir -p "$RESULT_DIR"
-
   {
     echo exec nice env -i JOBSTAMP=$jobstamp \\
     apply_to_env_config add_config_env
-    echo "  sh -e -c 'sh -e$- \"$SCRIPT\" " "$@" " 2>&1 | tee \"$log\"'"
+    echo "  sh -e -o pipefail -c 'sh -e$- \"$SCRIPT\" " "$@" " 2>&1 | tee \"$log\"'"
   } >"$start".sh
   . "$start".sh
 }
@@ -115,8 +119,8 @@ function set_arch_env() {
 set -e -o pipefail
 test -n "$JOB" || { # include guard
   set_job_env
-  restart_if_needed "$@"
   run_upper_level_config
+  restart_if_needed "$@"
   load_functions
   set_arch_env
   set_tool_env
