@@ -41,7 +41,8 @@ function restart_if_needed() {
       restart_clean_env "$@"
       ;;
     *)  # incorrect
-      error "JOBSTAMP=$JOBSTAMP does not meet JOB=$JOB name"
+      echo "JOBSTAMP=$JOBSTAMP does not meet JOB=$JOB name"
+      # exit 1 FIXME  uncomment
       ;;
   esac
 }
