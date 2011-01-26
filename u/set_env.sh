@@ -38,12 +38,12 @@ function restart_if_needed() {
       return;
       ;;
     '') # not set
+      restart_clean_env "$@"
       ;;
-    *)  # inherited from deploy task or otherwise incorrect
-      unset RESULT_DIR WORKSPACE_DIR
+    *)  # incorrect
+      error "JOBSTAMP=$JOBSTAMP does not meet JOB=$JOB name"
       ;;
   esac
-  restart_clean_env "$@"
 }
 
 function add_config_env() {

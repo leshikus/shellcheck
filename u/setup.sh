@@ -45,7 +45,8 @@ case " $* " in
     ;;
   *)
     wget_dist "$HUDSON_URL"
-    install_plugins 
+    install_plugins
+    unset JOBSTAMP WORKSPACE_DIR RESULT_DIR
     java -DHUDSON_HOME="$HUDSON_HOME" -jar "$DDIR"/timestamp/hudson.war
     ;;
 esac
