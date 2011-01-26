@@ -339,7 +339,7 @@ function evaluate_log() (
 )
 
 function create_and_run_tests() (
-  cd "$WORKSPACE_DIR"
+  cd "$WORKSPACE_DIR"/trunk
   create_launch_scripts "$@" >"$JDIR"/launch_scripts.sh
   . "$JDIR"/launch_scripts.sh
   evaluate_log
