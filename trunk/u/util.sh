@@ -30,6 +30,7 @@ function quote_space() {
 function relink_job_workspace() {
   local job="$1"
   local local_workspace="$HUDSON_HOME/jobs/$job"/workspace
+  local workspace_dir="$TMP_DIR/$job"_workspace
 
   if test -L "$local_workspace"
   then
@@ -38,8 +39,8 @@ function relink_job_workspace() {
   then rm -rf "$local_workspace"
   fi
 
-  ln -s "$WORKSPACE_DIR" "$local_workspace"
-  mkdir -p "$WORKSPACE_DIR"
+  ln -s "$workspace_dir" "$local_workspace"
+  mkdir -p "$workspace_dir"
 }
 
 function check_env() {

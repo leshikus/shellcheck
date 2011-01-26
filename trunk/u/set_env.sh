@@ -30,7 +30,9 @@ function set_job_env() {
   else
     JDIR="$HUDSON_HOME/jobs/$JOB"
   fi
+}
 
+function restart_if_needed() {
   case $JOBSTAMP in
     ${JOB}_*) # set when restart, no need to restart
       return;
@@ -38,10 +40,10 @@ function set_job_env() {
     '') # not set
       ;;
     *)  # inherited from deploy task or otherwise incorrect
-      apply_to_env_config unset
+      unset RESULT_DIR WORKSPACE_DIR
       ;;
   esac
-  restart_clean_env
+  restart_clean_env "$@"
 }
 
 function add_config_env() {
@@ -53,7 +55,7 @@ function add_config_env() {
 function restart_clean_env() {
   local jobstamp=${JOB}_`get_timestamp`
   RESULT_DIR=`readlink -f "${RESULT_DIR:-$DDIR/result/$jobstamp}"`
-  WORKSPACE_DIR=`readlink -f "${WORKSPACE_DIR:-$TMP_DIR/${JOB}_workspace}"`
+  WORKSPACE_DIR=`readlink -f "${WORKSPACE_DIR:-$JDIR/workspace}"`
   local log="$RESULT_DIR/$jobstamp.log"
   local start="$RESULT_DIR/$JOB"
   mkdir -p "$RESULT_DIR"
@@ -111,6 +113,7 @@ function set_arch_env() {
 set -e -o pipefail
 test -n "$JOB" || { # include guard
   set_job_env
+  restart_if_needed "$@"
   run_upper_level_config
   load_functions
   set_arch_env
