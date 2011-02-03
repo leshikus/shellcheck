@@ -56,11 +56,6 @@ function test_dir() {
   touch "$dir"/.permission_test || error "$dir has invalid permissions"
 }
 
-function set_tmp_file_name() {
-  test_dir "$TMP_JOB_DIR"
-  TMP_FILE="$TMP_JOB_DIR/$1"
-}
-
 function add_line() {
   grep -Fx "$1" "$2" || echo "$1" >>"$2"
 }
@@ -129,15 +124,11 @@ function test_dist() (
 )
 
 # 0 if the file was not downloaded
-function wget_newer() {
-  set_tmp_file_name wget_dist_err
-  (
-    cd "$DDIR"/timestamp
-    wget -N "$1" 2>"$TMP_FILE"
-  )
-  
-  fgrep "Server file no newer than local file" "$TMP_FILE"
-}
+function wget_newer() (
+  cd "$DDIR"/timestamp
+  wget -N "$1" 2>"$TMP_JOB_DIR"/wget_dist_err
+  fgrep -q "Server file no newer than local file" "$TMP_JOB_DIR"/wget_dist_err
+)
 
 function check_sig() {
   DIST_NAME="$1"
