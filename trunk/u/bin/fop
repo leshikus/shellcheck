@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -vx 
+
+DDIR=`dirname "$0"`/..
+. "$DDIR"/config.sh
+
+wget_dist "$APACHE_URL"/xmlgraphics/fop/binaries/fop-0.95-bin.tar.gz
+
+exec_tool "$@"
+
+

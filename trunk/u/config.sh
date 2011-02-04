@@ -4,6 +4,7 @@
 # Set software URLs
 #
 GNU_URL=http://mirrors.kernel.org/gnu
+APACHE_URL=http://apache.inetbridge.net
 HUDSON_URL=http://hudson.gotdns.com/latest/hudson.war
 
 #

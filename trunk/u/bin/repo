@@ -1,9 +1,8 @@
 #!/bin/sh
 
 DDIR=`dirname "$0"`/..
-. "$DDIR"/util.sh
+. "$DDIR"/config.sh
 
 wget_dist http://android.git.kernel.org/repo
-
 exec_tool "$@"
 

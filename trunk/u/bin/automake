@@ -1,9 +1,8 @@
 #!/bin/sh
 
 DDIR=`dirname "$0"`/..
-. "$DDIR"/util.sh
+. "$DDIR"/config.sh
 
-gnuget_dist automake/automake-1.10.3.tar.bz2
-
+get_gnu_dist "$GNU_URL"/automake/automake-1.10.3.tar.bz2
 exec_tool "$@"
 

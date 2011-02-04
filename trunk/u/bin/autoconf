@@ -1,9 +1,8 @@
 #!/bin/sh
 
 DDIR=`dirname "$0"`/..
-. "$DDIR"/util.sh
+. "$DDIR"/config.sh
 
-gnuget_dist autoconf/autoconf-latest.tar.bz2
-
+get_gnu_dist "$GNU_URL"/autoconf/autoconf-latest.tar.bz2
 exec_tool "$@"
 
