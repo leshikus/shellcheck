@@ -24,6 +24,10 @@ function quote_space() {
   sed -e 's/ /\\ /g'
 }
 
+function get_root_dir() {
+  sed -e 's/\/.*$//'
+}
+
 #
 # Filesystem
 #
@@ -52,7 +56,7 @@ function test_dir() {
   local dir="$1"
   test -n "$1" || error "The directory is not set"
   echo "$dir" | grep -q '^/......' || error "$dir is relative or less than six letters"
-  echo "$dir" | grep -vqF '.' || error "$dir has . inside"
+  echo "/$dir" | grep -vqF '/.' || error "$dir has . inside"
   touch "$dir"/.permission_test || error "$dir has invalid permissions"
 }
 
@@ -88,12 +92,10 @@ function unpack_dist() {
   FILE_TYPE=`file -b "$DIST"`
   case "$FILE_TYPE" in
   bzip2\ compressed\ data*)
-    tar -jtf "$DIST" | head -1
-    tar -jxf "$DIST" -C "$DDIR"/dist
+    tar -vjxf "$DIST" -C "$DDIR"/dist >"$TMP_JOB_DIR/$1".log
     ;;
   gzip\ compressed\ data*)
-    tar -ztf "$DIST" | head -1
-    tar -zxf "$DIST" -C "$DDIR"/dist
+    tar -vzxf "$DIST" -C "$DDIR"/dist >"$TMP_JOB_DIR/$1".log
     ;;
   Bourne\ shell\ script\ text\ executable)
     ln -fs "$DIST" "$DDIR/usr/bin/$DIST_NAME"
@@ -103,20 +105,23 @@ function unpack_dist() {
   *)
     return 1;
   esac
+  head -1 "$TMP_JOB_DIR/$1".log | get_root_dir
 }
 
-function build_dist() {
-  DIST_DIR="$1"
-  test -n "$DIST_DIR" || error "Empty DIST_DIR"
-  (
-    cd "$DDIR/dist/$DIST_DIR"
-    test -f "configure" && ./configure -prefix="$DDIR"/usr
-    test -f "Makefile" && {
-      make
-      make install prefix="$DDIR"/usr
-    }
-  )
-}
+function build_dist() (
+  DIST_DIR="$DDIR/dist/$1"
+  test_dir "$DIST_DIR"
+
+  test -x "$DIST_DIR"/configure || {
+    find "$DIST_DIR" -type f -perm /u+x -exec ln -fs {} "$DDIR"/usr/bin \;
+    return
+  }
+
+  cd "$BUILD_DIR"
+  "$DIST_DIR"/configure -prefix="$DDIR"/usr
+  make
+  make install
+)
 
 function test_dist() (
   cd "$DDIR/dist/$DIST_DIR"
@@ -156,24 +161,43 @@ function wget_dist() {
     check_sig "$DIST_NAME" "$DIST_SIG"
   )
 
-  if DIST_DIR=`unpack_dist "$DIST_NAME"`
-  then
-    build_dist "$DIST_DIR"
-  fi
+  DIST_DIR=`unpack_dist "$DIST_NAME"` || return
+  build_dist "$DIST_DIR"
 }
 
-function gnuget_dist() {
-  wget_newer "$GNU_URL/gnu-keyring.gpg" || {
+function get_gnu_dist() {
+  wget_newer "$GNU_URL/gnu-keyring.gpg" ||
     gpg --import "$DDIR"/timestamp/gnu-keyring.gpg
-  }
+
   wget_dist "$GNU_URL/$1" sig
+}
+
+function get_dist() {
+  local url="$1"
+
+  case "$url" in
+    http://*/gnu/*)
+      get_gnu_dist "$url"
+      break
+      ;;
+    http://*) 
+      wget_dist "$url"
+      break
+      ;;
+    git:*)
+      get_git_dist "$url"
+      break
+      ;;
+    *)
+      error "Cannot get $url"
+   esac
 }
 
 function get_git_dist_dir() {
   echo "$1" | perl -n -e '/(\w+).git$/ && print $1'
 }
 
-function git_dist() {
+function get_git_dist() {
   GIT_DIST="$1"
   CHECK_DIST="$2"
 
