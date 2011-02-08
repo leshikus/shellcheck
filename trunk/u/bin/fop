@@ -1,12 +1,8 @@
 #!/bin/sh
 
-set -vx 
+function get_dist_callback() {
+  wget_dist "$APACHE_URL"/xmlgraphics/fop/binaries/fop-0.95-bin.tar.gz
+}
 
-DDIR=`dirname "$0"`/..
-. "$DDIR"/config.sh
-
-wget_dist "$APACHE_URL"/xmlgraphics/fop/binaries/fop-0.95-bin.tar.gz
-
-exec_tool "$@"
-
+. `dirname "$0"`/get_dist.sh
 
