@@ -78,28 +78,50 @@ function rm_svn_subdir() {
 }
 
 function clean_tmp() {
-  test_dir "$TMP_DIR"
-  echo "$TMP_DIR" | fgrep -q "/tmp" || error "Is not a temporary directory: $TMP_DIR"
-  find "$TMP_DIR" -maxdepth 1 -atime 2 -exec rm -rf {} \;
+  local dir="${1:-$TMP_DIR}"
+
+  test_dir "$dir"
+  echo "$dir" | fgrep -q "$TMP_DIR" || error "Is not a temporary directory: $dir"
+  find "$dir" -maxdepth 1 -atime 2 -exec rm -rf {} \;
+}
+
+function get_dir_lock() {
+  local timeout=1
+  local lock="${1:-$HOME}"/.lock
+  while expr $timeout \< 2048
+  do
+    test -f "$lock" || {
+      echo $$ >"$lock"
+      return
+    }
+    local pid=`cat $lock`
+    echo "Waiting for $lock (PID = $pid) for $timeout sec"
+    sleep $timeout
+    timeout=`expr $timeout + $timeout`
+  done
+}
+
+function release_dir_lock() {
+  rm "${1:-$HOME}"/.lock
 }
 
 #
 # Dependence Download & Build Utilities
 #
 function unpack_dist() {
-  DIST="$DDIR/timestamp/$1"
+  DIST="$TMP_DIR/downloads/$1"
 
   FILE_TYPE=`file -b "$DIST"`
   case "$FILE_TYPE" in
   bzip2\ compressed\ data*)
-    tar -vjxf "$DIST" -C "$DDIR"/dist >"$TMP_JOB_DIR/$1".log
+    tar -vjxf "$DIST" -C "$TMP_DIR"/dist >"$TMP_JOB_DIR/$1".log
     ;;
   gzip\ compressed\ data*)
-    tar -vzxf "$DIST" -C "$DDIR"/dist >"$TMP_JOB_DIR/$1".log
+    tar -vzxf "$DIST" -C "$TMP_DIR"/dist >"$TMP_JOB_DIR/$1".log
     ;;
   Bourne\ shell\ script\ text\ executable)
-    ln -fs "$DIST" "$DDIR/usr/bin/$DIST_NAME"
-    chmod u+x "$DDIR/usr/bin/$DIST_NAME"
+    ln -fs "$DIST" "$TOOL_DIR/bin/$DIST_NAME"
+    chmod u+x "$TOOL_DIR/bin/$DIST_NAME"
     return 1;
     ;;
   *)
@@ -109,28 +131,28 @@ function unpack_dist() {
 }
 
 function build_dist() (
-  DIST_DIR="$DDIR/dist/$1"
+  DIST_DIR="$TMP_DIR/dist/$1"
   test_dir "$DIST_DIR"
 
   test -x "$DIST_DIR"/configure || {
-    find "$DIST_DIR" -type f -perm /u+x -exec ln -fs {} "$DDIR"/usr/bin \;
+    find "$DIST_DIR" -type f -perm /u+x -exec ln -fs {} "$TMP_DIR"/tools/bin \;
     return
   }
 
   cd "$BUILD_DIR"
-  "$DIST_DIR"/configure -prefix="$DDIR"/usr
+  "$DIST_DIR"/configure --prefix="$TMP_DIR"/tools
   make
   make install
 )
 
 function test_dist() (
-  cd "$DDIR/dist/$DIST_DIR"
+  cd "$TMP_DIR/dist/$DIST_DIR"
   make check
 )
 
 # 0 if the file was not downloaded
 function wget_newer() (
-  cd "$DDIR"/timestamp
+  cd "$TMP_DIR"/downloads
   wget -N "$1" 2>"$TMP_JOB_DIR"/wget_dist_err
   fgrep -q "Server file no newer than local file" "$TMP_JOB_DIR"/wget_dist_err
 )
@@ -156,7 +178,7 @@ function wget_dist() {
   fi
 
   test -z "$DIST_SIG" || (
-    cd "$DDIR"/timestamp
+    cd "$TMP_DIR"/downloads
     wget "$DIST"."$DIST_SIG"
     check_sig "$DIST_NAME" "$DIST_SIG"
   )
@@ -167,7 +189,7 @@ function wget_dist() {
 
 function get_gnu_dist() {
   wget_newer "$GNU_URL/gnu-keyring.gpg" ||
-    gpg --import "$DDIR"/timestamp/gnu-keyring.gpg
+    gpg --import "$TMP_DIR"/downloads/gnu-keyring.gpg
 
   wget_dist "$GNU_URL/$1" sig
 }
@@ -203,15 +225,15 @@ function get_git_dist() {
 
   DIST_DIR=`get_git_dist_dir "$GIT_DIST"`
   (
-    if test -d "$DDIR/dist/$DIST_DIR/.git"
+    if test -d "$TMP_DIR/dist/$DIST_DIR/.git"
     then
-      cd "$DDIR/dist/$DIST_DIR"
+      cd "$TMP_DIR/dist/$DIST_DIR"
       git checkout | grep '' || return 0 # no changes
       git checkout . # revert changes
       git clean -xdf # delete untracked and ignored files
     else
-      cd "$DDIR/dist"
-      rm_dir "$DDIR/dist/$DIST_DIR"
+      cd "$TMP_DIR/dist"
+      rm_dir "$TMP_DIR/dist/$DIST_DIR"
       git clone "$GIT_DIST"
     fi
     build_dist "$DIST_DIR"
@@ -223,23 +245,10 @@ function update_dist() {
   local DIST="$SSH_ID:$1"
   local DIST_NAME=`basename "$1"`
 
-  rsync -lptDzve "$SVN_SSH" "$DIST" "$DDIR"/timestamp |
+  rsync -lptDzve "$SVN_SSH" "$DIST" "$TMP_DIR"/downloads |
     fgrep "$DIST_NAME" || return 0
 
-  rsync -rLptDzve "$SVN_SSH" "$DIST" "$DDIR"/dist
-}
-
-#
-# Replace the installation script with the tool
-#
-function exec_tool() {
-  NAME=`basename "$0"`
-  LOC=`which "$NAME"`
-  if test "$LOC" == "$DDIR/bin/$NAME"
-  then
-    error "Cannot install $NAME - try to reinstal it manually"
-  fi
-  exec "$LOC" "$@"
+  rsync -rLptDzve "$SVN_SSH" "$DIST" "$TMP_DIR"/dist
 }
 
 #
@@ -260,7 +269,7 @@ function set_tool_path() {
     fi
     
     update_dist "$bin"
-    bin="$DDIR/dist/$basedir"
+    bin="$TMP_DIR/dist/$basedir"
   }
   PATH="$bin:$PATH"
   export PATH

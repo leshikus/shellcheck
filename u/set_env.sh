@@ -9,6 +9,13 @@ function get_timestamp() {
   date '+%y%m%d_%H%M%S'
 }
 
+function quote_args() {
+  for arg in $@
+  do
+    echo $arg | sed -e "s/^/\\'/" -e "s/$/\\'/" -e "s/[']/\\'/g"
+  done
+}
+
 function apply_to_env_config() {
   alias config_env_callback=$1
   local config_env="$DDIR"/config.env.sh
@@ -56,10 +63,10 @@ function add_config_env() {
 
 function restart_clean_env() {
   local jobstamp=${JOB}_`get_timestamp`
-  RESULT_DIR="${RESULT_DIR:-$DDIR/result/$jobstamp}"
+  RESULT_DIR="${RESULT_DIR:-$TMP_DIR/$USER/result/$jobstamp}"
   WORKSPACE_DIR="${WORKSPACE_DIR:-$JDIR/workspace}"
 
-  mkdir -p "$TMP_DIR" "$RESULT_DIR" "$WORKSPACE_DIR"
+  mkdir -p "$RESULT_DIR" "$WORKSPACE_DIR"
   TMP_DIR=`readlink -f "$TMP_DIR"`
   RESULT_DIR=`readlink -f "$RESULT_DIR"`
   WORKSPACE_DIR=`readlink -f "$WORKSPACE_DIR"`
@@ -69,7 +76,7 @@ function restart_clean_env() {
   {
     echo exec nice env -i JOBSTAMP=$jobstamp \\
     apply_to_env_config add_config_env
-    echo "  sh -e -o pipefail -c 'sh -e$- \"$SCRIPT\" " "$@" " 2>&1 | tee \"$log\"'"
+    echo "  sh -e -o pipefail -c 'sh -e$- \"$SCRIPT\" \"\$@\""" 2>&1 | tee \"$log\"'" `quote_args "$@"`
   } >"$start".sh
   . "$start".sh
 }
@@ -82,21 +89,26 @@ function run_upper_level_config() {
 }
 
 function set_working_directories() {
-  TMP_JOB_DIR="$TMP_DIR/$JOBSTAMP"
+  TMP_JOB_DIR="$TMP_DIR/$USER/$JOBSTAMP"
   BUILD_DIR="$TMP_JOB_DIR"/build
 
-  mkdir -p "$DDIR"/dist "$DDIR"/timestamp "$DDIR"/usr/bin "$BUILD_DIR"
+  mkdir -p "$TMP_DIR"/dist "$TMP_DIR"/downloads "$TMP_DIR"/tools/bin "$BUILD_DIR" "$TMP_JOB_DIR"
+
+  # removable
+  chmod a+w "$TMP_DIR"/dist "$TMP_DIR"/downloads "$TMP_DIR"/tools "$BUILD_DIR" "$TMP_DIR/$USER" "$RESULT_DIR" "$WORKSPACE_DIR"
+
   relink_job_workspace $JOB
 }
 
 function set_tool_env() {
-  PATH="$DDIR/usr/bin:$DDIR/bin:/bin:/usr/bin"
   LANG=
 
-  QDIR=`echo "$DDIR" | quote_space`
-  LDFLAGS="-L$QDIR/usr/lib"
-  CPPFLAGS="-I$QDIR/usr/include"
-  LD_LIBRARY_PATH="$DDIR/usr/lib"
+  PATH="$TMP_DIR/tools/bin:$DDIR/bin:/bin:/usr/bin"
+  LD_LIBRARY_PATH="$TOOL_DIR/lib"
+
+  local q_tool_dir=`echo "$DDIR" | quote_space`
+  LDFLAGS="-L$q_tool_dir/lib"
+  CPPFLAGS="-I$q_tool_dir/include"
 
   SSH_ID=${SSH_ID:-$USER@$SSH_SERVER}
   SVN_SSH="ssh -p $SSH_PORT"

@@ -1,7 +1,8 @@
 #!/bin/sh
 
-DDIR=`dirname "$0"`/..
-. "$DDIR"/config.sh
+function get_dist_callback() {
+  git_dist git://git.sv.gnu.org/dejagnu.git
+}
 
 function test_dist() {
   cd "$DDIR"/dist/dejagnu
@@ -9,7 +10,5 @@ function test_dist() {
   make check
 }
 
-git_dist git://git.sv.gnu.org/dejagnu.git
-
-exec_tool "$@"
+. `dirname "$0"`/get_dist.sh
 

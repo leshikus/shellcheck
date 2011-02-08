@@ -1,8 +1,8 @@
 #!/bin/sh
 
-DDIR=`dirname "$0"`/..
-. "$DDIR"/config.sh
+function get_dist_callback() {
+  wget_dist http://android.git.kernel.org/repo
+}
 
-wget_dist http://android.git.kernel.org/repo
-exec_tool "$@"
+. `dirname "$0"`/get_dist.sh
 

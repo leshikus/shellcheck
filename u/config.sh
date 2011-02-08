@@ -14,7 +14,7 @@ HUDSON_URL=http://hudson.gotdns.com/latest/hudson.war
 USER="${USER:-hudson}"
 HOME="${HOME:-/home/hudson}"
 
-TMP_DIR="${TMP_DIR:-/tmp/$USER}"
+TMP_DIR="${TMP_DIR:-/tmp}"
 WORKSPACE_DIR="${WORKSPACE_DIR}"
 RESULT_DIR="${RESULT_DIR}"
 
