@@ -9,13 +9,6 @@ function get_timestamp() {
   date '+%y%m%d_%H%M%S'
 }
 
-function quote_args() {
-  for arg in $@
-  do
-    echo $arg | sed -e "s/^/\\'/" -e "s/$/\\'/" -e "s/[']/\\'/g"
-  done
-}
-
 function apply_to_env_config() {
   alias config_env_callback=$1
   local config_env="$DDIR"/config.env.sh
@@ -76,7 +69,7 @@ function restart_clean_env() {
   {
     echo exec nice env -i JOBSTAMP=$jobstamp \\
     apply_to_env_config add_config_env
-    echo "  sh -e -o pipefail -c 'sh -e$- \"$SCRIPT\" \"\$@\""" 2>&1 | tee \"$log\"'" `quote_args "$@"`
+    echo "  sh -e -o pipefail -c 'sh -e$- \"$SCRIPT\" \"\$@\""" 2>&1 | tee \"$log\"'" ' start.sh "$@"'
   } >"$start".sh
   . "$start".sh
 }
