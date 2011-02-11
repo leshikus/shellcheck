@@ -43,8 +43,8 @@ function relink_job_workspace() {
   then rm -rf "$local_workspace"
   fi
 
-  ln -s "$workspace_dir" "$local_workspace"
   mkdir -p "$workspace_dir"
+  ln -s "$workspace_dir" "$local_workspace"
 }
 
 function check_env() {
@@ -75,14 +75,6 @@ function rm_svn_subdir() {
   local dir=`cd $1; pwd -P`
   test -d "$dir/.svn" || error "Non-svn subdir: $1"
   rm_dir "$dir"
-}
-
-function clean_tmp() {
-  local dir="${1:-$TMP_DIR}"
-
-  test_dir "$dir"
-  echo "$dir" | fgrep -q "$TMP_DIR" || error "Is not a temporary directory: $dir"
-  find "$dir" -maxdepth 1 -atime 2 -exec rm -rf {} \;
 }
 
 function get_dir_lock() {
@@ -396,4 +388,17 @@ function hudson_update_workspace() (
   cd workspace
   . "$JDIR"/svn_update.sh
 )
+
+#
+# Keypair
+#
+function check_ssh() {
+  test -f "$KEY_NAME" ||
+    ssh-keygen -N "" -f "$KEY_NAME"
+
+  cat "$KEY_NAME".pub |
+    ssh -p $SSH_PORT $SSH_ID \
+    'read key; grep -Fx "$key" $HOME/.ssh/authorized_keys2 || echo "$key" >>$HOME/.ssh/authorized_keys2'
+}
+
 
