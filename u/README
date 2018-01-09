@@ -7,3 +7,5 @@ FILES
   configure_packages.sh
     Installs required packages for CentOS / RedHat
 
+UPDATE
+  Testing git branching
