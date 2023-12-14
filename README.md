@@ -146,27 +146,6 @@ There exist less compatible shells including like `csh`, `tcsh`, PowerShell, cmd
 
 
 
-<details>
-
-<summary>Assuming you have a POSIX shell version, how would you implement hash tables?</summary>
-
-A file which is named as a hash key.
-
-</details>
-
-
-
-<details>
-
-<summary>Assuming you have a POSIX shell version, how would you implement a list? How would you effectively get all elements of `list1` which are not a part of `list2`?</summary>
-
-A unix way to implement a list data structure is just a file with strings. You can use list operations as follows.
-```
-$ sort list1 list2 list2 | uniq -u
-```
-</details>
-
-
 <details>What command line interpreter should I use?</summary>
 
 This is a religious belief question, yet I think there is some rationale behind not using advanced bash functionality and limit yourself to a POSIX shell.
@@ -176,6 +155,33 @@ This is a religious belief question, yet I think there is some rationale behind 
 
 </details>
 
+
+
+## POSIX Shell
+
+The following questions are about POSIX shell with no advanced bash functionality.
+
+
+
+<details>
+
+<summary>How would you implement hash tables?</summary>
+
+A file which is named as a hash key.
+
+</details>
+
+
+
+<details>
+
+<summary>How would you implement a list? How would you get all elements of list1 which are not a part of list2?</summary>
+
+A unix way to implement a list data structure is just a file with strings. You can do list operations as follows.
+```
+$ sort list1 list2 list2 | uniq -u
+```
+</details>
 
 
 ## Fail Early
@@ -236,23 +242,6 @@ $ do_action || report_error
 
 
 
-## Tables
-
-<details>
-
-<summary>Which options do I have to work with text tables?</summary>
-
-Reading tables:
-- `awk`, just don't use its arrays and hashtables
-- `cut`
-
-Writing text tables:
-- `import prettytable`
-
-</details>
-
-
-
 ## Brackets
 
 Consider two functions.
@@ -301,5 +290,22 @@ delete_package_dir() {
 }
 ```
 Why .old is important?
+
+</details>
+
+
+
+## Tables
+
+<details>
+
+<summary>Which options does shell have to work with text tables?</summary>
+
+Reading tables:
+- `awk`, just don't use its arrays and hashtables
+- `cut`
+
+Writing text tables:
+- `import prettytable`
 
 </details>
