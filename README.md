@@ -1,10 +1,8 @@
 # Rationale Behind Bash Scripting
 
+## How to check if your script is good?
 
-## How to define a function
-
-
-Which of two variants should one use?
+Check the following function definitions.
 
 ```
 variant1$ function f() {
@@ -18,14 +16,21 @@ variant2$ f() {
   echo Do not use the keyword
 }
 ```
+```
 
 <details>
 
 <summary>Which of two variants should one use?</summary>
 
-Some old dialects do not understand `function` keyword, and the latter is shorter.
+`dash` does not understand `function` keyword.
 
 </details>
+
+How to guess the problems like this?
+
+
+
+
 
 Используйте shellcheck
 Будет легче поддерживать скрипты. На каждое предупреждение на сайте shellcheck есть страница пояснений.
