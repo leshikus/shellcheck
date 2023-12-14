@@ -1,18 +1,18 @@
 # Rationale Behind Shell Scripting
 
-## How to Check a Script?
+## How to Check?
 
 Check the following function definitions.
 
 ```
-variant1$ function f() {
+$ function func1() {
   echo Use the keyword
 }
 ```
 
 
 ```
-variant2$ f() {
+$ func2() {
   echo Do not use the keyword
 }
 ```
@@ -236,7 +236,32 @@ $ do_action || report_error
 $ rm -rf trash/
 
 
-## Commenting a Script
+## Brackets
+
+
+
+
+<details>
+
+Consider two functions.
+
+```
+func1() { cd; }
+```
+
+```
+func2() ( cd; )
+```
+
+<summary>What is the difference?</summary>
+
+The curly bracket does not start a separate process. The second function will execute `cd` in a separate process and this won't affect the current directory of the calling process.
+
+</details>
+
+
+
+## Comments
 
 Consider the following comment
 
