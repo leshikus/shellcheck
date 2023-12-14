@@ -126,13 +126,26 @@ It is either a bash version or an empty string. For example, in newer versions o
 
 </details>
 
+<details>
 
-`dash` does not have a number of advanced `bash` features including hash tables and lists.
+<summary>How many options do I have for a command line interpreter?</summary>
+
+Most common and sufficiently compatible options include:
+
+- `sh` POSIX shell standard which is not a separate shell but a mode for running the implementation
+- most popular `bash`
+- `dash` which does not include a number of advanced `bash` features including hash tables and lists
+- Korn shell `ksh`
+
+There exist less compatible shells including like `csh`, `tcsh`, PowerShell, cmd, etc.
+
+</details>
+
 
 
 <details>
 
-<summary>Assuming you have a minimal shell version, how would you implement hash tables?</summary>
+<summary>Assuming you have a POSIX shell version, how would you implement hash tables?</summary>
 
 A file which is named as a hash key.
 
@@ -141,7 +154,7 @@ A file which is named as a hash key.
 
 <details>
 
-<summary>Assuming you have a minimal shell version, how would you implement a list? How would you effectively get all elements of `list1` which are not a part of `list2`?</summary>
+<summary>Assuming you have a POSIX shell version, how would you implement a list? How would you effectively get all elements of `list1` which are not a part of `list2`?</summary>
 
 A unix way to implement a list data structure is just a file with strings. You can use list operations as follows.
 ```
@@ -151,20 +164,6 @@ $ sort list1 list2 list2 | uniq -u
 
 
 
-<details>
-
-<summary>How many options do I have for a command line interpreter?</summary>
-
-Most common and sufficiently compatible options include:
-
-- `sh` POSIX shell standard`
-- `bash`
-- `dash`
-- Korn shell `ksh`
-
-There are also less compatible options like `csh`, `tcsh`, PowerShell, cmd, etc.
-
-</details>
 
 
 <details>What command line interpreter should I use?</summary>
@@ -172,15 +171,13 @@ There are also less compatible options like `csh`, `tcsh`, PowerShell, cmd, etc.
 This is a religious belief question, yet I think there is some rationale behind not using advanced bash functionality. In other words, I'd recommend using a minimal subset of functionality which is common for all interpreters.
 
 - Command line interpreters really shine when you execute lists of commands and use other operating system features.
-- All other language functinality, including arrays, hash tables, etc, is better to be written in a real programming language e.g. python. Better means cheaper to debug and support.
+- All other language functinality, including arrays, hash tables, etc, is better to be written in a real programming language e.g. python3. Better means cheaper to debug and support.
 
 </details>
 
 
 
 
-Не используйте новую функциональность
-Если ваш скрипт требует использования новой функциональности bash, например, по соображениям скорости и работы с данными в памяти, то скорее всего его следует написать на python3.
 1. Вместо [[ используйте test.
 В некоторых установках Линукса, в том числе в новом Дебиан, /bin/sh указывает на dash вместо bash. У этого интерпретатора меньше возможностей. Например. поддерживаются {}, local a=b, export a=b.
 
