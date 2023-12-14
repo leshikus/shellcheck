@@ -241,6 +241,7 @@ Consider several conditionals:
 
 ```
 test -f test && echo test exists
+/bin/[ -f test ] && echo test exists
 [ -f test ] && echo test exists
 [[ -f test ]] && echo test exists
 if [ -f test ]; then echo test exists; fi
@@ -249,9 +250,17 @@ if [ -f test ]; then echo test exists; fi
 
 <details>
 
-<summary>What is the preferred variant?</summary>
+<summary>What are the differences? What is the preferred variant?</summary>
 
-The brackets were invented to make conditional look like in other languages. Masking one feature with another has when analogy breaks. For example, you cannot 
+- Generally it's a good strategy to use the style of the original author.
+- If the condition is somewhat complex, maybe it should not be a part of the script.
+- I prefered `test` because it outlined the fact that conditional statements in shells process return codes of conditions. Now `test` becomes `bash intrinsic`, thus the choice is purely cosmetic.
+
+Historically brackets were introduced to resembles how other languages. Double brackets appeared in Korn shell to support more different conditions.
+
+The following issues can be disregarded in the modern versions:
+- There was also a difference between `||` and `&&` with respect to `set -e` setting.
+- `if` launched a separed subshell and exiting it caused different issues.
 
 </details>
 
@@ -275,6 +284,35 @@ This command may delete something unexpected if
 </details>
 
 
+Consider the following invocation.
+
+```
+mount.sh -o ro,sync,user
+```
+???
+<details>
+
+<summary>How would you parse this?</summary>
+
+A switch statement can help
+
+```
+arg=ro,sync,user
+case ",$arg," In
+	*,ro,*)
+		echo ro
+		;;
+	*,sync,*)
+		echo sync
+		;;
+	*,user,*)
+		echo user
+		;;
+esac
+```
+
+
+</details>
 
 ## Brackets
 
@@ -358,9 +396,9 @@ Setting tabstop to two is less conventional.
 <summary>Which options does shell have to work with text tables?</summary>
 
 Reading tables:
-- `IFS=$table_separator read -r a b c` (`-r` is used for reading slashes)
-- `awk -F$table_separator`, just don't use its arrays and hashtables
-- `cut -d$table_separator`
+- `IFS="$table_separator" read -r a b c` (`-r` is used for reading slashes)
+- `awk -F"$table_separator"`, just don't use its arrays and hashtables
+- `cut -d"$table_separator"`
 
 Writing text tables:
 - `import prettytable`
