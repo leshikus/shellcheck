@@ -1,6 +1,6 @@
 # Rationale Behind Shell Scripting
 
-## How to check a script?
+## How to Check a Script?
 
 Check the following function definitions.
 
@@ -86,17 +86,17 @@ For more information:
 ```
 
 Note, each problem has a dedicated page with explanations.
-Shebang is a way to indicate the command line interpreter. It looks like `#!/bin/sh` or `#!/bin/bash` in the first line.
+<a href="https://en.wikipedia.org/wiki/Shebang_(Unix)">Shebang</a> is a way to indicate the command line interpreter. It looks like `#!/bin/sh` or `#!/bin/bash` in the first line.
 
 </details>
 
 Assume the script produces the following error
 
 ```
-$ cat test.txt
+$ cat test.sh
 echo Test
-$ sh test.txt
-test.txt: line 1: $'\357\273\277echo': command not found
+$ sh test.sh
+test.sh: line 1: $'\357\273\277echo': command not found
 ```
 
 <details>
@@ -108,7 +108,7 @@ An UTF-8 editor added a <a href="https://en.wikipedia.org/wiki/Byte_order_mark">
 </details>
 
 
-## Bash or not bash
+## Bash or not Bash
 
 Consider the following script
 
@@ -126,6 +126,15 @@ It is either a bash version or an empty string. For example, in newer versions o
 
 </details>
 
+<details>
+
+<summary>How many options do I have for a command line interpreter? What command line interpreter should I use?</summary>
+
+`bash` sympatizers usually 
+
+</details>
+
+
 
 
 Не используйте новую функциональность
@@ -135,6 +144,8 @@ It is either a bash version or an empty string. For example, in newer versions o
 3. Список - файл. Для большинства операций написаны готовые программы, например, чтобы получить все элементы list1, которые на содержатся в list2:
 $ sort list1 list2 list2 | uniq -u
 В некоторых установках Линукса, в том числе в новом Дебиан, /bin/sh указывает на dash вместо bash. У этого интерпретатора меньше возможностей. Например. поддерживаются {}, local a=b, export a=b.
+
+
 Можно использовать синтаксис, который работает как в bash, так и в dash:
 1. Вместо
 Используйте останов по ошибке
