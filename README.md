@@ -153,7 +153,21 @@ $ sort list1 list2 list2 | uniq -u
 
 <details>
 
-<summary>How many options do I have for a command line interpreter? What command line interpreter should I use?</summary>
+<summary>How many options do I have for a command line interpreter?</summary>
+
+Most common and sufficiently compatible options include:
+
+- `sh` POSIX shell standard`
+- `bash`
+- `dash`
+- Korn shell `ksh`
+
+There are also less compatible options like `csh`, `tcsh`, PowerShell, cmd, etc.
+
+</details>
+
+
+<details>What command line interpreter should I use?</summary>
 
 This is a religious belief question, yet I think there is some rationale behind not using advanced bash functionality. In other words, I'd recommend using a minimal subset of functionality which is common for all interpreters.
 
