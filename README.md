@@ -1,6 +1,6 @@
 # Rationale Behind Bash Scripting
 
-## How to check if your script is good?
+## How to check a script?
 
 Check the following function definitions.
 
@@ -29,6 +29,7 @@ variant2$ f() {
 
 <summary>How to guess the problems like this?</summary>
 
+
 Use `shellcheck`, e.g.
 
 ```
@@ -44,15 +45,52 @@ For more information:
 
 </details>
 
+## Oneliner
+
+Consider the following script.
+
+```
+echo Test
+```
+
+<details>
+<summary>Guess the basic problem with it</summary>
+
+```
+In test.sh line 1:
+echo Test
+^-- SC2148: Tips depend on target shell and yours is unknown. Add a shebang.
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2148 -- Tips depend on target shell and y...
+```
+
+Take a note, each problem has a dedicated page with explanations.
+
+</details>
+
+Assume the script produces the following error
+
+```
+afedotov@afedotov-mobl1 MINGW64 ~/git/shellcheck (techtalk)
+$ cat test.txt
+echo Test
+afedotov@afedotov-mobl1 MINGW64 ~/git/shellcheck (techtalk)
+$ sh test.txt
+test.txt: line 1: $'\357\273\277echo': command not found
+```
+
+<details>
+
+<summary>Guess the problem</summary>
+
+An editor added a <a href="https://en.wikipedia.org/wiki/Byte_order_mark">byte order mark</a> to the script.
+
+</details>
 
 
 
 
-
-
-
-Используйте shellcheck
-Будет легче поддерживать скрипты. На каждое предупреждение на сайте shellcheck есть страница пояснений.
 Используйте Шебанг
 Всегда указывайте интерпретатор, который будет исполнять скрипт, в первой строчке скрипта:
 #!/bin/sh
