@@ -16,7 +16,6 @@ variant2$ f() {
   echo Do not use the keyword
 }
 ```
-```
 
 <details>
 
