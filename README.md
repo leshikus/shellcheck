@@ -122,7 +122,7 @@ echo "$BASH_VERSION"
 
 <summary>What does this script print?</summary>
 
-It is either a bash version or an empty string. For example, in newer versions of Debian `/bin/sh` points to `/bin/dash`.
+It is undefined. For example, in newer versions of Debian `/bin/sh` symbolically links to `/bin/dash`.
 
 </details>
 
@@ -168,7 +168,7 @@ $ sort list1 list2 list2 | uniq -u
 
 <details>What command line interpreter should I use?</summary>
 
-This is a religious belief question, yet I think there is some rationale behind not using advanced bash functionality. In other words, I'd recommend using a minimal subset of functionality which is common for all interpreters.
+This is a religious belief question, yet I think there is some rationale behind not using advanced bash functionality and limit yourself to a POSIX shell.
 
 - Command line interpreters really shine when you execute lists of commands and use other operating system features.
 - All other language functinality, including arrays, hash tables, etc, is better to be written in a real programming language e.g. python3. Better means cheaper to debug and support.
@@ -179,7 +179,6 @@ This is a religious belief question, yet I think there is some rationale behind 
 
 
 1. Вместо [[ используйте test.
-В некоторых установках Линукса, в том числе в новом Дебиан, /bin/sh указывает на dash вместо bash. У этого интерпретатора меньше возможностей. Например. поддерживаются {}, local a=b, export a=b.
 
 
 Можно использовать синтаксис, который работает как в bash, так и в dash:
@@ -219,12 +218,6 @@ $ echo $a
 Опция -r позволит читать бэкслэши \. Очистка IFS гарантирует, что будет прочитана ровно одна строка.
 Используйте функции do_something
 Использование имен функций, начинающихся с глагола, поможет не писать комментарии # here we do something, а также эффективно отлаживать код по частям. Вместо того, чтобы описывать в комментариях аргументы функций, используйте значимые имена переменных:
-backup_package() {
-  local package
-  package="$1"
-
-  cp "$package" "$package".old
-}
 Используйте trap для очистки состояния
 Следующая команда гарантирует, что cleanup будет вызван при любом завершении скрипта, за исключением сигнала -KILL.
 $ trap cleanup EXIT
@@ -241,3 +234,35 @@ $ do_action || report_error
 Удаляйте с возвратом
 Вместо удаления можно переместить файл командой mv в папку trash/. Запускать чистку этой папки можно перед началом работы, при этом несколько явно указанных символов в названии папки гарантирует, что не будет стерто что-то полезное:
 $ rm -rf trash/
+
+
+## Commenting a Script
+
+Consider the following comment
+
+```
+# the following function backups the package
+myfunc() {
+  local package
+  package="$1"
+
+  cp "$package" "$package".old
+}
+```
+
+
+<details>
+
+<summary>What would you change?</summary>
+
+Delete the comment.
+```
+backup_package() {
+  local package
+  package="$1"
+
+  cp "$package" "$package".old
+}
+```
+
+</details>
