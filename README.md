@@ -65,7 +65,7 @@ For more information:
 
 </details>
 
-## Oneliner
+## One-Liner
 
 Consider the following script.
 
@@ -126,11 +126,39 @@ It is either a bash version or an empty string. For example, in newer versions o
 
 </details>
 
+
+`dash` does not have a number of advanced `bash` features including hash tables and lists.
+
+
+<details>
+
+<summary>Assuming you have a minimal shell version, how would you implement hash tables?</summary>
+
+A file which is named as a hash key.
+
+</details>
+
+
+<details>
+
+<summary>Assuming you have a minimal shell version, how would you implement a list? How would you effectively get all elements of `list1` which are not a part of `list2`?</summary>
+
+A unix way to implement a list data structure is just a file with strings. You can use list operations as follows.
+```
+$ sort list1 list2 list2 | uniq -u
+```
+</details>
+
+
+
 <details>
 
 <summary>How many options do I have for a command line interpreter? What command line interpreter should I use?</summary>
 
-`bash` sympatizers usually 
+This is a religious belief question, yet I think there is some rationale behind not using advanced bash functionality. In other words, I'd recommend using a minimal subset of functionality which is common for all interpreters.
+
+- Command line interpreters really shine when you execute lists of commands and use other operating system features.
+- All other language functinality, including arrays, hash tables, etc, is better to be written in a real programming language e.g. python. Better means cheaper to debug and support.
 
 </details>
 
@@ -140,9 +168,6 @@ It is either a bash version or an empty string. For example, in newer versions o
 Не используйте новую функциональность
 Если ваш скрипт требует использования новой функциональности bash, например, по соображениям скорости и работы с данными в памяти, то скорее всего его следует написать на python3.
 1. Вместо [[ используйте test.
-2. Хэш-таблица - файл с именем ключа.
-3. Список - файл. Для большинства операций написаны готовые программы, например, чтобы получить все элементы list1, которые на содержатся в list2:
-$ sort list1 list2 list2 | uniq -u
 В некоторых установках Линукса, в том числе в новом Дебиан, /bin/sh указывает на dash вместо bash. У этого интерпретатора меньше возможностей. Например. поддерживаются {}, local a=b, export a=b.
 
 
