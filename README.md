@@ -1,20 +1,29 @@
 # Rationale Behind Bash Scripting
 
-==TBD
+
+## How to define a function
+
+
+Which of two variants should one use?
+
+```
+variant1$ function f() {
+  echo Use the keyword
+}
+```
+
+
+```
+variant2$ f() {
+  echo Do not use the keyword
+}
+```
 
 <details>
 
-<summary>Tips for collapsed sections</summary>
+<summary>Which of two variants should one use?</summary>
 
-### You can add a header
-
-You can add text within a collapsed section. 
-
-You can add an image or a code block, too.
-
-```ruby
-   puts "Hello World"
-```
+Some old dialects do not understand `function` keyword, and the latter is shorter.
 
 </details>
 
@@ -34,13 +43,6 @@ $ sort list1 list2 list2 | uniq -u
 В некоторых установках Линукса, в том числе в новом Дебиан, /bin/sh указывает на dash вместо bash. У этого интерпретатора меньше возможностей. Например. поддерживаются {}, local a=b, export a=b.
 Можно использовать синтаксис, который работает как в bash, так и в dash:
 1. Вместо
-$ function f() {
-  echo Function
-}
-пишите
-$ f() {
-  echo Function
-}
 Используйте останов по ошибке
 В отличие от обычных программ скрипты после ошибки не останавливаются и могут поломать что-нибудь ещё.  Установите следующую опцию в начале работы, чтобы скрипт останавливался по ошибке:
 $ set -e
