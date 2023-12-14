@@ -32,15 +32,15 @@ $ ls -l /bin/?ash
 Consider writing `dash`-aware scripts. Instead of `local a="$b"` use the following:
 
 ```
-$ local a
-$ a="$b"
+local a
+a="$b"
 ```
 
 Instead of `export a="$b"` use the following:
 
 ```
-$ a="$b"
-$ export a
+a="$b"
+export a
 ```
 
 </details>
