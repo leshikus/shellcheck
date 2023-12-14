@@ -25,7 +25,27 @@ variant2$ f() {
 
 </details>
 
-How to guess the problems like this?
+<details>
+
+<summary>How to guess the problems like this?</summary>
+
+Use `shellcheck`, e.g.
+
+```
+$ shellcheck test.sh
+
+In test.sh line 4:
+function f() { echo $a; }
+^-----------------------^ SC2112: 'function' keyword is non-standard. Delete it.
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2112 -- 'function' keyword is non-standar...
+```
+
+</details>
+
+
+
 
 
 
