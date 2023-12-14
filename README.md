@@ -304,7 +304,6 @@ Consider the following comment
 
 ```
 # delete the package dir
-```
 rm -rf "$p"
 ```
 
@@ -325,6 +324,7 @@ delete_package_dir() {
 
 delete_package_dir "$p"
 ```
+
 Why .old is important?
 
 </details>
