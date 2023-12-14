@@ -238,11 +238,6 @@ $ rm -rf trash/
 
 ## Brackets
 
-
-
-
-<details>
-
 Consider two functions.
 
 ```
@@ -252,6 +247,8 @@ func1() { cd; }
 ```
 func2() ( cd; )
 ```
+
+<details>
 
 <summary>What is the difference?</summary>
 
@@ -266,12 +263,13 @@ The curly bracket does not start a separate process. The second function will ex
 Consider the following comment
 
 ```
-# the following function backups the package
+# the function deletes the package dir
 myfunc() {
   local package
   package="$1"
 
-  cp "$package" "$package".old
+  mv "$package" "$package".old
+  rm -rf "$package".old &
 }
 ```
 
@@ -282,11 +280,12 @@ myfunc() {
 
 Delete the comment.
 ```
-backup_package() {
+delete_package_dir() {
   local package
   package="$1"
 
   cp "$package" "$package".old
+  rm -rf "$package".old &
 }
 ```
 
