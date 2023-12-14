@@ -1,4 +1,4 @@
-# Rationale Behind Bash Scripting
+# Rationale Behind Shell Scripting
 
 ## How to check a script?
 
@@ -65,17 +65,16 @@ For more information:
   https://www.shellcheck.net/wiki/SC2148 -- Tips depend on target shell and y...
 ```
 
-Take a note, each problem has a dedicated page with explanations.
+Note, each problem has a dedicated page with explanations.
+Shebang is a way to indicate the command line interpreter. It looks like `#!/bin/sh` or `#!/bin/bash` in the first line.
 
 </details>
 
 Assume the script produces the following error
 
 ```
-afedotov@afedotov-mobl1 MINGW64 ~/git/shellcheck (techtalk)
 $ cat test.txt
 echo Test
-afedotov@afedotov-mobl1 MINGW64 ~/git/shellcheck (techtalk)
 $ sh test.txt
 test.txt: line 1: $'\357\273\277echo': command not found
 ```
@@ -84,18 +83,12 @@ test.txt: line 1: $'\357\273\277echo': command not found
 
 <summary>Guess the problem</summary>
 
-An editor added a <a href="https://en.wikipedia.org/wiki/Byte_order_mark">byte order mark</a> to the script.
+An UTF-8 editor added a <a href="https://en.wikipedia.org/wiki/Byte_order_mark">byte order mark</a> to the script.
 
 </details>
 
 
 
-
-Используйте Шебанг
-Всегда указывайте интерпретатор, который будет исполнять скрипт, в первой строчке скрипта:
-#!/bin/sh
-или
-#!/bin/bash
 Не используйте новую функциональность
 Если ваш скрипт требует использования новой функциональности bash, например, по соображениям скорости и работы с данными в памяти, то скорее всего его следует написать на python3.
 1. Вместо [[ используйте test.
