@@ -135,12 +135,12 @@ If the first line would be `#!/bin/bash`, would it guarantee the result?
 
 Most common and sufficiently compatible options include:
 
-- `sh` POSIX shell standard which is not a separate shell but a mode for running the implementation
+- plain Bourne shell `sh` is rarely used today on a systems like Solaris; on modern Linux systems `sh` is an alias for POSIX mode `bash` or `dash`
 - most popular `bash`
 - `dash` which does not include a number of advanced `bash` features including hash tables and lists
 - Korn shell `ksh`
 
-There exist less compatible shells including like `csh`, `tcsh`, PowerShell, cmd, etc.
+There exist less compatible shells including like `csh`, `tcsh`, PowerShell, cmd, etc. 
 
 </details>
 
@@ -150,7 +150,7 @@ There exist less compatible shells including like `csh`, `tcsh`, PowerShell, cmd
 
 <summary>What command line interpreter should I use?</summary>
 
-This is a religious belief question, yet I think there is some rationale behind not using advanced bash functionality and limit yourself to a POSIX shell.
+This is a religious belief question, yet I think there is some rationale behind not using advanced bash functionality and limit myself to a POSIX shell.
 
 - Command line interpreters really shine when you execute lists of commands and use other operating system features.
 - All other language functinality, including arrays, hash tables, etc, is better to be written in a real programming language e.g. python3. Better means cheaper to debug and support.
@@ -249,12 +249,14 @@ The correct program quotes function arguments, e.g. invokes `count_args "$@"`.
 Consider several conditionals:
 
 ```
-/bin/test -f test && echo test exists
-test -f test && echo test exists
-/bin/[ -f test ] && echo test exists
-[ -f test ] && echo test exists
-[[ -f test ]] && echo test exists
-if [ -f test ]; then echo test exists; fi
+/bin/test -f test && echo passed!
+test -f test && echo passed!
+/bin/[ -f test ] && echo passed!
+[ -f test ] && echo passed!
+[[ -f test ]] && echo passed!
+if [ -f test ]; then echo passed!; fi
+expr 0 \< 1 &&  echo passed!
+if (( 0 < 1 )); then echo passed!; fi
 ```
 
 
@@ -264,13 +266,13 @@ if [ -f test ]; then echo test exists; fi
 
 - Generally it's a good strategy to use the style of the original author.
 - If the condition is somewhat complex, maybe it should not be a part of the script.
-- I prefered `test` because it outlined the fact that conditional statements in shells process return codes of conditions. Now `test` becomes `bash` builtin, thus the choice is purely cosmetic.
 
-Historically brackets were introduced to resembles how other languages. Double brackets appeared in Korn shell to support more different conditions.
+Historically brackets were introduced to resembles how other languages. Double brackets appeared in Korn shell to support more different conditions. Using `test` and `expr` prevents you from putting too complex logic into your scripts.
 
 The following issues can be disregarded in the modern versions:
 - There was also a difference between `||` and `&&` with respect to `set -e` setting.
 - `if` launched a separed subshell and exiting it caused different issues.
+
 
 </details>
 
@@ -294,35 +296,6 @@ This command may delete something unexpected if
 </details>
 
 
-Consider the following invocation.
-
-```
-mount.sh -o ro,sync,user
-```
-???
-<details>
-
-<summary>How would you parse this?</summary>
-
-A switch statement can help
-
-```
-arg=ro,sync,user
-case ",$arg," In
-	*,ro,*)
-		echo ro
-		;;
-	*,sync,*)
-		echo sync
-		;;
-	*,user,*)
-		echo user
-		;;
-esac
-```
-
-
-</details>
 
 ## Brackets
 
