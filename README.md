@@ -29,6 +29,20 @@ $ ls -l /bin/?ash
 -rwxr-xr-x 1 root root  129816 Jul 18  2019 /bin/dash
 ```
 
+Consider writing `dash`-aware scripts. Instead of `local a="$b"` use the following:
+
+```
+$ local a
+$ a="$b"
+```
+
+Instead of `export a="$b"` use the following:
+
+```
+$ a="$b"
+$ export a
+```
+
 </details>
 
 <details>
@@ -106,9 +120,9 @@ echo "$BASH_VERSION"
 
 <details>
 
-<summary>What prints this script?</summary>
+<summary>What does this script print?</summary>
 
-It is undefined. For example, in newer versions of Debian `/bin/sh` points to `/bin/dash`.
+It is either a bash version or an empty string. For example, in newer versions of Debian `/bin/sh` points to `/bin/dash`.
 
 </details>
 
@@ -144,16 +158,8 @@ $ cp *.txt /dir
 $ cp "*.txt" /dir
 Не используйте файлы с именем, начинающимся с -
 Такие файлы не надо создавать самому. Но если файлы приходят откуда-то снаружи, потребуется добавить в скрипт -- перед передачей их в качестве аргументов системным командам.
-2. Вместо
-$ local a="$b"
-пишите
-$ local a
-$ a="$b"
-3. Вместо
-$ export a="$b"
-пишите
-$ a="$b"
-$ export a
+
+
 По возможности лучше не использовать экспорт переменных.
 Также, существуют ситуации, когда нестандартный синтаксис не выдает ошибку, но дает разный результат, например:
 $ f() {
