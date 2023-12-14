@@ -21,7 +21,13 @@ variant2$ f() {
 
 <summary>Which of two variants should one use?</summary>
 
-`dash` does not understand `function` keyword.
+`dash` does not understand `function` keyword. `dash` is a rewritten and shorter version of `bash`:
+
+```
+$ ls -l /bin/?ash
+-rwxr-xr-x 1 root root 1183448 Apr 18  2022 /bin/bash
+-rwxr-xr-x 1 root root  129816 Jul 18  2019 /bin/dash
+```
 
 </details>
 
@@ -84,6 +90,25 @@ test.txt: line 1: $'\357\273\277echo': command not found
 <summary>Guess the problem</summary>
 
 An UTF-8 editor added a <a href="https://en.wikipedia.org/wiki/Byte_order_mark">byte order mark</a> to the script.
+
+</details>
+
+
+## Bash or not bash
+
+Consider the following script
+
+```
+#!/bin/sh
+
+echo "$BASH_VERSION"
+```
+
+<details>
+
+<summary>What prints this script?</summary>
+
+It is undefined. For example, in newer versions of Debian `/bin/sh` points to `/bin/dash`.
 
 </details>
 
