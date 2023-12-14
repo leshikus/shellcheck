@@ -2,8 +2,21 @@
 
 ==TBD
 
->! But this is  
-> not a spoiler
+<details>
+
+<summary>Tips for collapsed sections</summary>
+
+### You can add a header
+
+You can add text within a collapsed section. 
+
+You can add an image or a code block, too.
+
+```ruby
+   puts "Hello World"
+```
+
+</details>
 
 Используйте shellcheck
 Будет легче поддерживать скрипты. На каждое предупреждение на сайте shellcheck есть страница пояснений.
