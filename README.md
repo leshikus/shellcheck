@@ -418,7 +418,7 @@ This is just a syntetic example. How would you do OOO approach in a shell?
 
 <summary>An object name</summary>
 
-One can use a method name prefix instead, e. g. `fs__open`
+One can use a method name prefix instead, e. g. `fs__open()` for `fs.open()`
 
 </details>
 
