@@ -296,6 +296,27 @@ This command may delete something unexpected if
 </details>
 
 
+Consider the following:
+```
+options="ro user sync"
+```
+
+<details>
+
+<summary>How would you check if `ro` option is set if?</summary>
+
+Use `case`:
+```
+case " $options " in
+    *\ ro\ *)
+        echo ro
+        ;;
+esac
+```
+</details>
+
+
+
 
 ## Brackets
 
