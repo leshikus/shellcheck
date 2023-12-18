@@ -243,6 +243,23 @@ The correct program quotes function arguments, e.g. invokes `count_args "$@"`.
 </details>
 
 
+Consider execution quotes:
+```
+$ echo `basename "$0"`
+$ echo $(basename "$0")
+```
+
+<details>
+
+<summary>Which are better?</summary>
+
+Bracket quotes are better because open and closing quotes differ.
+
+</details>
+
+
+
+
 
 ## Conditionals
 
@@ -430,7 +447,6 @@ Load a new method definition
 
 ```
 source fs_ext4_impl
-
 ```
 </details>
 
