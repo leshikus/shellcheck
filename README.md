@@ -408,3 +408,29 @@ Writing text tables:
 - `import prettytable`
 
 </details>
+
+
+## Objects
+
+This is just a syntetic example. How would you do OOO approach in a shell?
+
+<details>
+
+<summary>An object name</summary>
+
+One can use a method name prefix instead, e. g. `fs__open`
+
+</details>
+
+<details>
+
+<summary>Overloading a method</summary>
+
+Load a new method definition
+
+```
+source fs_ext4_impl
+
+```
+</details>
+
