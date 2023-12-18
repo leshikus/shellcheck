@@ -1,5 +1,31 @@
 # Rationale Behind Shell Scripting
 
+
+
+## Running Shell
+
+<details>
+
+<summary>Shell on Windows</summary>
+
+- WSL
+- git-scm.com
+
+</details>
+
+
+
+<details>
+
+<summary>Most useful shortcut</summary>
+
+- Ctrl+W remove previous word
+- Ctrl+R reverse search
+
+</details>
+
+
+
 ## How to Check?
 
 Check the following function definitions.
@@ -17,9 +43,11 @@ $ func2() {
 }
 ```
 
+
+
 <details>
 
-<summary>Which of two variants should one use?</summary>
+<summary>Which of two variants?</summary>
 
 `dash` does not understand `function` keyword. `dash` is a rewritten and shorter version of `bash`:
 
@@ -45,9 +73,11 @@ export a
 
 </details>
 
+
+
 <details>
 
-<summary>How to guess the problems like this?</summary>
+<summary>How to guess this?</summary>
 
 
 Use `shellcheck`, e.g.
@@ -65,6 +95,8 @@ For more information:
 
 </details>
 
+
+
 ## One-Liner
 
 Consider the following script.
@@ -74,7 +106,7 @@ echo Test
 ```
 
 <details>
-<summary>Guess the basic problem with it</summary>
+<summary>Guess the problem</summary>
 
 ```
 In test.sh line 1:
@@ -158,7 +190,6 @@ This is a religious belief question, yet I think there is some rationale behind 
 </details>
 
 
-
 ## POSIX Shell
 
 The following questions are about POSIX shell with no advanced bash functionality.
@@ -203,6 +234,25 @@ One may notice here that there are three different ways to set a shell option. T
 
 </details>
 
+
+The following code calls cleanup function on exit
+
+```trap cleanup EXIT```
+
+<details>
+
+<summary>What are pro an contra</summary>
+
+- If you exit normally, then you may clean resources without `trap`.
+- If you exit on error, you may need resources like virtual machines to debug the problem.
+- If the process is killed, cleanup will not be called.
+
+I don't think this us very useful practice.
+
+</details>
+
+
+
 ## Quoting
 
 Consider the following program:
@@ -241,6 +291,34 @@ The correct program quotes function arguments, e.g. invokes `count_args "$@"`.
 
 
 </details>
+
+
+Consider execution quotes:
+```
+$ echo `basename "$0"`
+$ echo $(basename "$0")
+```
+
+<details>
+
+<summary>Which are better?</summary>
+
+Brackets are better because open and closing brackets differ.
+
+</details>
+
+
+<details>
+
+<summary>Double quotes or single quotes?</summary>
+
+- Double quotes provide variable interpolation (substitution), e.g. `"message=$message"`
+- Same style is easer to read
+- (Least important) single quotes are easier to read
+
+</details>
+
+
 
 
 
@@ -296,8 +374,29 @@ This command may delete something unexpected if
 </details>
 
 
+Consider the following:
+```
+options="ro user sync"
+```
 
-## Brackets
+<details>
+
+<summary>How would you check if read-only option is set if?</summary>
+
+Use `case`:
+```
+case " $options " in
+    *\ ro\ *)
+        echo ro
+        ;;
+esac
+```
+</details>
+
+
+
+
+## Subshells
 
 Consider two functions.
 
@@ -314,6 +413,34 @@ func2() ( cd; )
 <summary>What is the difference?</summary>
 
 The curly bracket does not start a separate process. The second function will execute `cd` in a separate process and this won't affect the current directory of the calling shell.
+
+</details>
+
+
+
+Consider two examples
+
+```
+while true
+do
+    exit 0
+done
+echo finished
+```
+
+```
+while true
+do
+    exit 0
+done | tee log
+echo finished
+```
+
+<details>
+
+<summary>What is the difference in behavior?</summary>
+
+`exit` in the latter exit example exits a subshell, thus `finished` is printed
 
 </details>
 
@@ -371,19 +498,66 @@ Setting tabstop to two is less conventional.
 
 
 
+## Replacement
+
+Consider the following example:
+
+```
+$ ls -l t/a
+-rw-r--r-- 1 aaf aaf 2 Dec 21 16:35 t/a
+$ sed -i 's/a/b/' t/a
+sed: couldn't open temporary file t/sedwa91gQ: Permission denied
+```
+
+<details>
+
+<summary>What is the problem here?</summary>
+
+`sed -i` tries to create a temporary file and cannot, need to check directory permissions.
+
+</details>
+
+
 
 ## Tables
 
 <details>
 
-<summary>Which options does shell have to work with text tables?</summary>
+<summary>How to work with text tables?</summary>
 
 Reading tables:
 - `IFS="$table_separator" read -r a b c` (`-r` is used for reading slashes)
 - `awk -F"$table_separator"`, just don't use its arrays and hashtables
 - `cut -d"$table_separator"`
+- these simple tools should not be used for some complex logic
 
 Writing text tables:
-- `import prettytable`
+- `import prettytable` or `import pandas`
 
 </details>
+
+
+
+## Objects
+
+This is just a syntetic example. How would you do OOO approach in a shell?
+
+<details>
+
+<summary>An object name</summary>
+
+One can use a method name prefix instead, e. g. `fs__open()` for `fs.open()`
+
+</details>
+
+<details>
+
+<summary>Overloading a method</summary>
+
+Load a new method definition
+
+```
+source fs_ext4_impl
+```
+</details>
+
