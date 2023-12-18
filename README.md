@@ -303,7 +303,7 @@ options="ro user sync"
 
 <details>
 
-<summary>How would you check if `ro` option is set if?</summary>
+<summary>How would you check if read-only option is set if?</summary>
 
 Use `case`:
 ```
