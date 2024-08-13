@@ -133,7 +133,7 @@ $ A=1 echo $A
 
 <summary>What does it print?</summary>
 
-It prints the previous value of `A`, or nothing if `A` was not set. Interpolation takes place before the execution.
+It prints the previous value of `A`, or nothing, if `A` was not set. Interpolation takes place before the execution.
 
 </details>
 
