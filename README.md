@@ -122,6 +122,22 @@ Note, each problem has a dedicated page with explanations.
 
 </details>
 
+
+Consider the following code
+
+```
+$ A=1 echo $A
+```
+
+<details>
+
+<summary>What does it print?</summary>
+
+It prints the previous value of `A`, or nothing if `A` was not set. Interpolation takes place before the execution.
+
+</details>
+
+
 Assume the script produces the following error
 
 ```
@@ -138,6 +154,7 @@ test.sh: line 1: $'\357\273\277echo': command not found
 An UTF-8 editor added a <a href="https://en.wikipedia.org/wiki/Byte_order_mark">byte order mark</a> to the script.
 
 </details>
+
 
 
 ## Bash or not Bash
@@ -560,4 +577,13 @@ Load a new method definition
 source fs_ext4_impl
 ```
 </details>
+
+
+
+## Thanks
+
+[@gshimansky](https://www.github.com/gshimansky)
+[@kwasd](https://www.github.com/kwasd)
+[@pbchekin](https://www.github.com/pbchekin)
+for their contributions
 
